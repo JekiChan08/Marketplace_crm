@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Добавить продукт</title>
+</head>
+<body>
+<form th:action="@{/products/add}" th:object="${new_product}" method="post">
+    <label> "Имя"<input type="text" th:field="*{name}"></label><br/>
+    <label> "Цена"<input type="text" th:field="*{price}"></label><br/>
+
+    <label> "Категория"
+        <select th:field="*{category}">
+            <option value="">Выберите категорию</option>
+            <option th:each="category : ${all_categories}" th:value="${category.id}" th:text="${category.name}"></option>
+        </select>
+    </label><br/>
+
+    <input type="submit" value="Сохранить">
+</form>
+</body>
+</html>

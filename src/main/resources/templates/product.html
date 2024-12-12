@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+<ul th:object="${product}">
+    <li><p th:text="*{name}"></p></li>
+    <li><p th:text="*{price}"></p></li>
+    <li><p th:text="*{category.name}"></p></li>
+</ul>
+</body>
+</html>

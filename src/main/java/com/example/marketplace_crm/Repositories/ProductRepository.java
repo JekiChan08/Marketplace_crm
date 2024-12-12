@@ -1,12 +1,13 @@
 package com.example.marketplace_crm.Repositories;
 
-import com.example.marketplace_crm.Model.User;
+import com.example.marketplace_crm.Model.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
 @Repository
-public interface UserRepository extends JpaRepository<User, String> {
-    Optional<User> findByLogin(String login);
+public interface ProductRepository extends JpaRepository<Product, String> {
+    Product findByName(String name);
+
 }
