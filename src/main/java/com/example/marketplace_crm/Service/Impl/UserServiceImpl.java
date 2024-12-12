@@ -42,9 +42,6 @@ public class UserServiceImpl implements UserService {
     public User saveUser(User myUser) {
         myUser.setPassword(bCryptPasswordEncoder.encode(myUser.getPassword()));
         myUser.setRoles(List.of(roleRepository.findById(USER_ROLE_ID).get()));
-        for (int i = 0; i < myUser.getRoles().size(); i++) {
-            System.out.println(myUser.getRoles().get(i));
-        }
         return userRepository.save(myUser);
     }
 

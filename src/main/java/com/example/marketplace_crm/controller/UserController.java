@@ -19,7 +19,10 @@ public class UserController {
     @GetMapping("/{id}")
     public String getById(@PathVariable String id, Model model){
         User user = us.findById(id);
-        model.addAttribute("sdfsf", user);
+        model.addAttribute("user", user);
+        for (int i = 0; i < user.getRoles().size(); i++) {
+            System.out.println(user.getRoles().get(i));
+        }
         return "user";
     }
 

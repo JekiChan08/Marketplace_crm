@@ -20,7 +20,7 @@ public class SecurityConfig {
         this.myUserDetailService = myUserDetailService;
         this.encoderConfig = encoderConfig;
     }
-//
+
 //    @Bean
 //    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
 //        return httpSecurity.httpBasic().disable()
@@ -34,13 +34,14 @@ public class SecurityConfig {
 //                                .anyRequest().authenticated()
 //                ).build();
 //    }
-@Bean
-public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
     return httpSecurity
             .httpBasic().disable()
             .csrf().disable()
             .authorizeHttpRequests(auths -> auths
-                    .requestMatchers("/main/**").hasAnyRole("USER", "ADMIN")
+                    .requestMatchers("/persons/**", "/users/**").hasAnyRole("USER", "ADMIN")
                     .requestMatchers("/auth/**").permitAll()
                     .requestMatchers("/css/**", "/images/**").permitAll()
                     .anyRequest().authenticated()
@@ -53,7 +54,7 @@ public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws
             .permitAll()
             .and()
             .build();
-}
+    }
 
 
     @Bean
