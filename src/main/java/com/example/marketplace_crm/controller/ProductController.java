@@ -1,6 +1,7 @@
 package com.example.marketplace_crm.controller;
 
 
+import com.example.marketplace_crm.Model.Category;
 import com.example.marketplace_crm.Model.Product;
 import com.example.marketplace_crm.Model.User;
 import com.example.marketplace_crm.Service.CategoryService;
@@ -8,9 +9,23 @@ import com.example.marketplace_crm.Service.ProductService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.Base64;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Controller
@@ -35,15 +50,35 @@ public class ProductController {
         model.addAttribute("all_categories", categoryService.getAllCategory());
         return "add-product";
     }
+
     @PostMapping("/add")
-    public String save(@ModelAttribute Product product, Model model){
+    public String addProduct(@ModelAttribute Product product,
+                              @RequestParam("imageFile") MultipartFile imageFile) throws IOException {
+        if (!imageFile.isEmpty()) {
+            // Преобразуем файл в строку Base64
+            byte[] imageBytes = imageFile.getBytes();
+            String encodedImage = Base64.getEncoder().encodeToString(imageBytes);
+            product.setImage(encodedImage);  // Сохраняем изображение как строку Base64
+        }
         productService.saveProduct(product);
-        model.addAttribute("text", "Успешно сохронено");
         return "redirect:/products/add";
     }
-    @GetMapping("/all_products")
+
+    @GetMapping("/list")
     public String getAllProducts(Model model) {
         model.addAttribute("products", productService.getAllProduct());
         return "products";
     }
+    @GetMapping("/{id}/image")
+    public ResponseEntity<String> getProductImage(@PathVariable String id) {
+        Product product = productService.findById(id);
+        if (product != null && product.getImage() != null) {
+            String base64Image = product.getImage();
+            return new ResponseEntity<>(base64Image, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+
 }

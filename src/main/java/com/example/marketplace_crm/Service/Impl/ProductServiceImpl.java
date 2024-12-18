@@ -7,7 +7,10 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.util.Base64;
 import java.util.List;
 
 @Service
@@ -15,30 +18,30 @@ import java.util.List;
 @Data
 public class ProductServiceImpl implements ProductService {
     @Autowired
-    private ProductRepository repository;
+    private ProductRepository productRepository;
 
     @Override
     public Product findById(String Id) {
-        return repository.findById(Id).orElse(null);
+        return productRepository.findById(Id).orElse(null);
     }
 
     @Override
     public Product saveProduct(Product product) {
-        return repository.save(product);
+        return productRepository.save(product);
     }
 
     @Override
     public void deleteProductById(String Id) {
-        repository.deleteById(Id);
+        productRepository.deleteById(Id);
     }
 
     @Override
     public List<Product> getAllProduct() {
-        return repository.findAll();
+        return productRepository.findAll();
     }
 
     @Override
     public Product findByName(String name) {
-        return repository.findByName(name);
+        return productRepository.findByName(name);
     }
 }
