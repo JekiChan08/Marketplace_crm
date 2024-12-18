@@ -1,0 +1,26 @@
+services:
+  app:
+    image: 'db-demo'
+    build:
+      context: .
+    container_name: app
+    depends_on:
+      - db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=ac
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/marketplace
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=ac
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+    ports:
+      - "6868:8080"
+  db:
+    image: postgres
+    container_name: db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=ac
+      - POSTGRES_DB=marketplace
+    ports:
+      - "5433:5432"

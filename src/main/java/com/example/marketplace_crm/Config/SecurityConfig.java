@@ -21,20 +21,6 @@ public class SecurityConfig {
         this.encoderConfig = encoderConfig;
     }
 
-//    @Bean
-//    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-//        return httpSecurity.httpBasic().disable()
-//                .csrf().disable()
-//                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-//                .and()
-//                .authorizeHttpRequests(
-//                        auths -> auths
-//                                .requestMatchers("**/persons/**").hasAnyRole("USER", "ADMIN", "user", "User")
-//                                .requestMatchers("**/auth/**").permitAll()
-//                                .anyRequest().authenticated()
-//                ).build();
-//    }
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
     return httpSecurity

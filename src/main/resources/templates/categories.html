@@ -6,10 +6,13 @@
 </head>
 <body>
 <div th:each="category: ${categories}">
-    <td th:text="${category.id}"></td>
-    <td th:text="${category.name}"></td>
+    <div>
+        <img th:src="'data:image/png;base64,' + ${category.image}" alt="Category Image" width="200"/>
+    </div>
+    <h3 th:text="${category.name}">Category Name</h3>
+    <p th:text="${category.description}">Category Description</p>
     <form th:action="@{/categories/{id}(id=${category.id})}" method="get">
-        <button type="submit">Перейти к категориям</button>
+        <button type="submit">Перейти к категорию</button>
     </form>
 </div>
 <br>

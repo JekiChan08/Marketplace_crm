@@ -1,14 +1,21 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Информация о продукте</title>
 </head>
 <body>
-<ul th:object="${product}">
-    <li><p th:text="*{name}"></p></li>
-    <li><p th:text="*{price}"></p></li>
-    <li><p th:text="*{category.name}"></p></li>
-</ul>
+
+<div>
+    <img th:src="'data:image/png;base64,' + ${product.image}" alt="Product Image" width="200"/>
+</div>
+
+<div>
+    <h1 th:text="${product.name}">Название продукта</h1>
+    <p><strong>Описание:</strong> <span th:text="${product.description}">Описание продукта</span></p>
+    <p><strong>Цена:</strong> <span th:text="${product.price}">Цена продукта</span> ₽</p>
+    <p><strong>Категория:</strong> <span th:text="${product.category.name}">Категория продукта</span></p>
+</div>
 </body>
 </html>

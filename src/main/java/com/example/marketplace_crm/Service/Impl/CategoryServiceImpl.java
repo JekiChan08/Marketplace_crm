@@ -8,7 +8,9 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @Service
@@ -16,29 +18,30 @@ import java.util.List;
 @Data
 public class CategoryServiceImpl implements CategoryService {
     @Autowired
-    private CategoryRepository repository;
+    private CategoryRepository categoryRepository;
+
     @Override
     public Category findById(String Id) {
-        return repository.findById(Id).orElse(null);
+        return categoryRepository.findById(Id).orElse(null);
     }
 
     @Override
     public Category saveCategory(Category category) {
-        return repository.save(category);
+        return categoryRepository.save(category);
     }
 
     @Override
     public void deleteCategoryById(String Id) {
-        repository.deleteById(Id);
+        categoryRepository.deleteById(Id);
     }
 
     @Override
     public List<Category> getAllCategory() {
-        return repository.findAll();
+        return categoryRepository.findAll();
     }
 
     @Override
     public Category findByName(String name) {
-        return repository.findByName(name);
+        return categoryRepository.findByName(name);
     }
 }
