@@ -13,5 +13,6 @@ public interface ProductService {
     void deleteProductById(String Id);
     List<Product> getAllProduct();
     Product findByName(String name);
+    List<Product> findByNameContaining(String name);
     //Product addProduct(Product product, MultipartFile file) throws IOException ;
 }
