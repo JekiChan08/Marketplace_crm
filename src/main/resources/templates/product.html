@@ -6,11 +6,15 @@
     <title>Информация о продукте</title>
 </head>
 <body>
+<form th:action="@{/products/list/search/{name}(name=${query})}" method="GET">
+    <input type="text" name="query" placeholder="Введите название продукта" />
+    <br />
+    <button type="submit">Искать</button>
+</form>
 
 <div>
     <img th:src="'data:image/png;base64,' + ${product.image}" alt="Product Image" width="200"/>
 </div>
-
 <div>
     <h1 th:text="${product.name}">Название продукта</h1>
     <p><strong>Описание:</strong> <span th:text="${product.description}">Описание продукта</span></p>

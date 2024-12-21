@@ -25,6 +25,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Base64;
+import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -66,9 +67,34 @@ public class ProductController {
 
     @GetMapping("/list")
     public String getAllProducts(Model model) {
-        model.addAttribute("products", productService.getAllProduct());
+        List<Product> products = productService.getAllProduct();
+        if (products != null) {
+            model.addAttribute("isProduct", true);
+            model.addAttribute("products", products);
+            model.addAttribute("all_categories", categoryService.getAllCategory());
+        }else {
+            model.addAttribute("isProduct", false);
+            model.addAttribute("product", null);
+            model.addAttribute("all_categories", categoryService.getAllCategory());
+        }
         return "products";
     }
+    @GetMapping("/list/search")
+    public String findByNameContaining(Model model, @RequestParam(required = false) String query) {
+        if (query != null && !query.isEmpty()) {
+            List<Product> products = productService.findByNameContaining(query);
+            if (products != null && !products.isEmpty()) {
+                model.addAttribute("isProduct", true);
+                model.addAttribute("products", products);
+            } else {
+                model.addAttribute("isProduct", false);
+                model.addAttribute("products", null);
+            }
+        }
+        return "products";
+    }
+
+
     @GetMapping("/{id}/image")
     public ResponseEntity<String> getProductImage(@PathVariable String id) {
         Product product = productService.findById(id);

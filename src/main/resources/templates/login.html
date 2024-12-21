@@ -7,7 +7,7 @@
 <body>
 <div th:replace="fragments/sidebar :: sidebar"></div>
 
-
+<a th:href="@{/auth/registration}">registration</a>
 <form method="post" th:action="@{/auth/login}">
     <label for="username">Логин</label>
     <input type="text" id="username" name="username">
