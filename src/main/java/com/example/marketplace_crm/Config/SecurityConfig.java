@@ -27,8 +27,8 @@ public class SecurityConfig {
             .httpBasic().disable()
             .csrf().disable()
             .authorizeHttpRequests(auths -> auths
-                    .requestMatchers("/persons/**", "/users/**").hasAnyRole("USER", "ADMIN")
-                    .requestMatchers("/auth/**", "/products/add").permitAll()
+                    .requestMatchers("/products/**", "/users/**", "/categories/**").hasAnyRole("USER", "ADMIN")
+                    .requestMatchers("/auth/**").permitAll()
                     .requestMatchers("/css/**", "/images/**").permitAll()
                     .anyRequest().authenticated()
             )

@@ -6,6 +6,7 @@
     <title>Информация о продукте</title>
 </head>
 <body>
+<div th:replace="fragments/sidebar :: sidebar"></div>
 <form th:action="@{/products/list/search/{name}(name=${query})}" method="GET">
     <input type="text" name="query" placeholder="Введите название продукта" />
     <br />
@@ -20,6 +21,26 @@
     <p><strong>Описание:</strong> <span th:text="${product.description}">Описание продукта</span></p>
     <p><strong>Цена:</strong> <span th:text="${product.price}">Цена продукта</span> ₽</p>
     <p><strong>Категория:</strong> <span th:text="${product.category.name}">Категория продукта</span></p>
+</div>
+<h2>Добавить комментарии</h2>
+<form th:action="@{/products/create_comment}" th:object="${new_comment}" method="post">
+    <label>
+        <textarea th:field="*{text}" placeholder="Оставьте комментарий"></textarea>
+    </label>
+    <button type="submit">Отправить</button>
+</form>
+
+<h2>Комментарии</h2>
+<div th:if="${isComment}">
+    <th:block th:each="comment : ${comments}">
+        <div>
+            <p><strong>Имя:</strong> <span th:text="${comment.user.login}">Имя</span></p>
+            <p><strong>комент:</strong> <span th:text="${comment.text}">text</span></p>
+        </div>
+    </th:block>
+</div>
+<div th:if="${isComment == false}">
+    <p>Комментарии не найдены.</p>
 </div>
 </body>
 </html>

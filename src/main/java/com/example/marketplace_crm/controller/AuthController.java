@@ -30,10 +30,6 @@ public class AuthController {
         this.service = service;
         this.repository = repository;
     }
-    @GetMapping("/index")
-    public String home(){
-        return "index";
-    }
 
     @GetMapping("/registration")
     public String registrationForm(Model model){

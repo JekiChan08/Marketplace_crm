@@ -40,9 +40,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User saveUser(User myUser) {
-        myUser.setPassword(bCryptPasswordEncoder.encode(myUser.getPassword()));
-        myUser.setRoles(List.of(roleRepository.findById(USER_ROLE_ID).get()));
-        return userRepository.save(myUser);
+        if (userRepository.findByLogin(myUser.getLogin()).isPresent()) {
+            myUser.setPassword(bCryptPasswordEncoder.encode(myUser.getPassword()));
+            myUser.setRoles(List.of(roleRepository.findById(USER_ROLE_ID).get()));
+            return userRepository.save(myUser);
+        }else {
+            return null;
+        }
     }
 
 }
