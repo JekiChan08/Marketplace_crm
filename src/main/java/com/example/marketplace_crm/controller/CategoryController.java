@@ -1,15 +1,12 @@
 package com.example.marketplace_crm.controller;
 
 import com.example.marketplace_crm.Model.Category;
-import com.example.marketplace_crm.Model.Product;
 import com.example.marketplace_crm.Service.CategoryService;
 import com.example.marketplace_crm.Service.ProductService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -38,12 +35,12 @@ public class CategoryController {
         return "category";
     }
 
-    @GetMapping("/add")
+    @GetMapping("/create")
     public String add(Model model) {
         model.addAttribute("new_category", new Category());
-        return "add-category";
+        return "create-category";
     }
-    @PostMapping("/add")
+    @PostMapping("/create")
     public String addCategory(@ModelAttribute Category category,
                               @RequestParam("imageFile") MultipartFile imageFile) throws IOException {
         if (!imageFile.isEmpty()) {

@@ -9,9 +9,9 @@ import java.util.List;
 
 public interface CategoryService {
 
-    Category findById(String Id);
+    Category findById(String id);
     Category saveCategory(Category category);
-    void deleteCategoryById(String Id);
+    void deleteCategoryById(String id);
     List<Category> getAllCategory();
     Category findByName(String name);
 //    Category addCategory(Category category, MultipartFile file) throws IOException;

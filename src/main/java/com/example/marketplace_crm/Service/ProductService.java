@@ -8,9 +8,9 @@ import java.io.IOException;
 import java.util.List;
 
 public interface ProductService {
-    Product findById(String Id);
+    Product findById(String id);
     Product saveProduct(Product product);
-    void deleteProductById(String Id);
+    void deleteProductById(String id);
     List<Product> getAllProduct();
     Product findByName(String name);
     List<Product> findByNameContaining(String name);

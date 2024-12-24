@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.6.xsd">
+    <changeSet id="1" author="JekiChan08">
+        <preConditions onFail="MARK_RAN">
+            <not>
+            <tableExists tableName="roles"/>
+            </not>
+        </preConditions>
+        <sql>
+            CREATE TABLE roles
+            (
+                id varchar default gen_random_uuid() not null primary key,
+                role_name varchar(255) not null unique
+            )
+        </sql>
+    </changeSet>
+    <changeSet id="2" author="JekiChan08">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="categories"/>
+            </not>
+        </preConditions>
+        <sql>
+            CREATE TABLE categories
+            (
+                id varchar default gen_random_uuid() not null primary key,
+                name varchar(255) not null,
+                image text,
+                description text
+            );
+        </sql>
+    </changeSet>
+    <changeSet id="3" author="JekiChan08">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="products"/>
+            </not>
+        </preConditions>
+        <sql>
+
+            CREATE TABLE products
+            (
+                id varchar default gen_random_uuid() not null primary key,
+                name varchar(255) not null,
+                price double precision not null,
+                category_id varchar constraint fk_category references categories,
+                image       text,
+                description text
+            )
+        </sql>
+    </changeSet>
+
+    <changeSet id="4" author="JekiChan08">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="users"/>
+            </not>
+        </preConditions>
+        <sql>
+            CREATE TABLE users
+            (
+                id varchar default gen_random_uuid() not null primary key,
+                login varchar(255) not null unique,
+                password varchar(255) not null
+            )
+        </sql>
+    </changeSet>
+
+    <changeSet id="5" author="JekiChan08">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="users_roles"/>
+            </not>
+        </preConditions>
+        <sql>
+            create table users_roles
+            (
+                user_id varchar not null references users on delete cascade,
+                role_id varchar not null references roles on delete cascade, primary key (user_id, role_id)
+            )
+        </sql>
+    </changeSet>
+
+
+    <changeSet id="6" author="JekiChan08">
+        <loadData tableName="roles" file="data/roles.csv" relativeToChangelogFile="true" separator=";"/>
+    </changeSet>
+
+    <changeSet id="9" author="JekiChan08">
+        <loadData tableName="users" file="data/users.csv" relativeToChangelogFile="true" separator=";"/>
+    </changeSet>
+    <changeSet id="10" author="JekiChan08">
+        <loadData tableName="users_roles" file="data/users_roles.csv" relativeToChangelogFile="true" separator=";"/>
+    </changeSet>
+</databaseChangeLog>

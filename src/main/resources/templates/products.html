@@ -5,6 +5,7 @@
     <title>Все вкусности</title>
 </head>
 <body>
+<div th:replace="fragments/sidebar :: sidebar"></div>
 <div>
     <form th:action="@{/products/list/search}" method="GET">
         <input type="text" name="query" placeholder="Введите название продукта..." />
@@ -15,7 +16,7 @@
 <h1>Продукты</h1>
 
 <div th:if="${isProduct}">
-    <h2>Результаты поиска:</h2>
+
     <ul>
         <th:block th:each="product : ${products}">
             <li>

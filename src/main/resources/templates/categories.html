@@ -5,6 +5,7 @@
     <title>Категории</title>
 </head>
 <body>
+<div th:replace="fragments/sidebar :: sidebar"></div>
 <div th:each="category: ${categories}">
     <div>
         <img th:src="'data:image/png;base64,' + ${category.image}" alt="Category Image" width="200"/>

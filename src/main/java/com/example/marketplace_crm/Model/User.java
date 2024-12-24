@@ -19,8 +19,6 @@ public class User{
     private String id;
     @Column(name = "login")
     private String login;
-    @Column(name = "online_status")
-    private String onlineStatus;
     @Column(name = "password")
     private String password;
     @ManyToMany(fetch = FetchType.EAGER)
