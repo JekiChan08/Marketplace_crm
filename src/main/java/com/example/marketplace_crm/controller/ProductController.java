@@ -1,6 +1,5 @@
 package com.example.marketplace_crm.controller;
 
-
 import com.example.marketplace_crm.Model.Comment;
 import com.example.marketplace_crm.Model.Product;
 import com.example.marketplace_crm.Model.User;
@@ -8,6 +7,12 @@ import com.example.marketplace_crm.Service.CategoryService;
 import com.example.marketplace_crm.Service.CommentService;
 import com.example.marketplace_crm.Service.ProductService;
 import com.example.marketplace_crm.Service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpSession;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +30,7 @@ import java.io.IOException;
 import java.util.Base64;
 import java.util.List;
 
+@Tag(name = "Product Controller", description = "Управление продуктами")
 @RequiredArgsConstructor
 @Controller
 @Data
@@ -39,16 +45,26 @@ public class ProductController {
     @Autowired
     private final UserService userService;
 
+    @Operation(
+            summary = "Получить продукт по ID",
+            description = "Возвращает страницу с информацией о продукте и его комментариями",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Продукт найден"),
+                    @ApiResponse(responseCode = "404", description = "Продукт не найден")
+            }
+    )
     @GetMapping("/{id}")
-    public String getById(@PathVariable String id, Model model, HttpSession session) {
+    public String getById(
+            @Parameter(description = "ID продукта", required = true) @PathVariable String id,
+            Model model,
+            HttpSession session
+    ) {
         Product product = productService.findById(id);
         List<Comment> comments = commentsService.findCommentByProduct(product);
 
         session.setAttribute("id_product", id);
 
-
         Comment comment = new Comment();
-
 
         model.addAttribute("new_comment", comment);
         model.addAttribute("product", product);
@@ -64,6 +80,10 @@ public class ProductController {
         return "product";
     }
 
+    @Operation(
+            summary = "Страница создания продукта",
+            description = "Возвращает страницу для создания нового продукта"
+    )
     @GetMapping("/create")
     public String create(Model model) {
         model.addAttribute("new_product", new Product());
@@ -71,21 +91,41 @@ public class ProductController {
         return "create-product";
     }
 
+    @Operation(
+            summary = "Создать новый продукт",
+            description = "Создает новый продукт с изображением",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Продукт успешно создан"),
+                    @ApiResponse(responseCode = "400", description = "Неверные данные")
+            }
+    )
     @PostMapping("/create")
-    public String createProduct(@ModelAttribute Product product,
-                              @RequestParam("imageFile") MultipartFile imageFile) throws IOException {
+    public String createProduct(
+            @Parameter(description = "Данные продукта", required = true) @ModelAttribute Product product,
+            @Parameter(description = "Изображение продукта", required = true) @RequestParam("imageFile") MultipartFile imageFile
+    ) throws IOException {
         if (!imageFile.isEmpty()) {
-            // Преобразуем файл в строку Base64
             byte[] imageBytes = imageFile.getBytes();
             String encodedImage = Base64.getEncoder().encodeToString(imageBytes);
-            product.setImage(encodedImage);  // Сохраняем изображение как строку Base64
+            product.setImage(encodedImage);
         }
         productService.saveProduct(product);
-
         return "redirect:/products/create";
     }
+
+    @Operation(
+            summary = "Создать комментарий",
+            description = "Создает новый комментарий для продукта",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Комментарий успешно создан"),
+                    @ApiResponse(responseCode = "400", description = "Неверные данные")
+            }
+    )
     @PostMapping("/create_comment")
-    public String createComment(Model model, @ModelAttribute("new_comment") Comment comment, HttpSession session) {
+    public String createComment(
+            @Parameter(description = "Данные комментария", required = true) @ModelAttribute("new_comment") Comment comment,
+            HttpSession session
+    ) {
         String product_id = (String) session.getAttribute("id_product");
         Product product = productService.findById(product_id);
 
@@ -101,6 +141,14 @@ public class ProductController {
         return "redirect:/products/" + product_id;
     }
 
+    @Operation(
+            summary = "Получить все продукты",
+            description = "Возвращает страницу со списком всех продуктов",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Продукты найдены"),
+                    @ApiResponse(responseCode = "404", description = "Продукты не найдены")
+            }
+    )
     @GetMapping("/list")
     public String getAllProducts(Model model) {
         List<Product> products = productService.getAllProduct();
@@ -108,15 +156,27 @@ public class ProductController {
             model.addAttribute("isProduct", true);
             model.addAttribute("products", products);
             model.addAttribute("all_categories", categoryService.getAllCategory());
-        }else {
+        } else {
             model.addAttribute("isProduct", false);
             model.addAttribute("product", null);
             model.addAttribute("all_categories", categoryService.getAllCategory());
         }
         return "products";
     }
+
+    @Operation(
+            summary = "Поиск продуктов по названию",
+            description = "Возвращает страницу с продуктами, найденными по названию",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Продукты найдены"),
+                    @ApiResponse(responseCode = "404", description = "Продукты не найдены")
+            }
+    )
     @GetMapping("/list/search")
-    public String findByNameContaining(Model model, @RequestParam(required = false) String query) {
+    public String findByNameContaining(
+            @Parameter(description = "Поисковый запрос", required = true) @RequestParam(required = false) String query,
+            Model model
+    ) {
         if (query != null && !query.isEmpty()) {
             List<Product> products = productService.findByNameContaining(query);
             if (products != null && !products.isEmpty()) {
@@ -130,9 +190,18 @@ public class ProductController {
         return "products";
     }
 
-
+    @Operation(
+            summary = "Получить изображение продукта",
+            description = "Возвращает изображение продукта в формате Base64",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Изображение найдено", content = @Content(schema = @Schema(type = "string"))),
+                    @ApiResponse(responseCode = "404", description = "Изображение не найдено")
+            }
+    )
     @GetMapping("/{id}/image")
-    public ResponseEntity<String> getProductImage(@PathVariable String id) {
+    public ResponseEntity<String> getProductImage(
+            @Parameter(description = "ID продукта", required = true) @PathVariable String id
+    ) {
         Product product = productService.findById(id);
         if (product != null && product.getImage() != null) {
             String base64Image = product.getImage();
@@ -141,6 +210,4 @@ public class ProductController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
-
-
 }

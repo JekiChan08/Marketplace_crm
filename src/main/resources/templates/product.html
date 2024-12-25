@@ -4,43 +4,204 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Информация о продукте</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .sidebar {
+            width: 250px;
+            background-color: #333;
+            color: white;
+            padding: 20px;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+        }
+        .sidebar a {
+            color: white;
+            text-decoration: none;
+            display: block;
+            margin: 15px 0;
+        }
+        .sidebar a:hover {
+            text-decoration: underline;
+        }
+        .content {
+            margin-left: 270px;
+            padding: 20px;
+        }
+        .search-form {
+            margin-bottom: 30px;
+        }
+        .search-form input[type="text"] {
+            padding: 10px;
+            width: 300px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .search-form button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 10px;
+        }
+        .search-form button:hover {
+            background-color: #0056b3;
+        }
+        .product-info {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        .product-info img {
+            border-radius: 10px;
+            max-width: 100%;
+            height: auto;
+            margin-bottom: 20px;
+        }
+        .product-info h1 {
+            font-size: 28px;
+            color: #333;
+            margin-bottom: 15px;
+        }
+        .product-info p {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        .product-info p strong {
+            color: #333;
+        }
+        .comment-form {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        .comment-form h2 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 15px;
+        }
+        .comment-form textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+            resize: vertical;
+            min-height: 100px;
+            margin-bottom: 15px;
+        }
+        .comment-form button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .comment-form button:hover {
+            background-color: #0056b3;
+        }
+        .comments-section {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+        .comments-section h2 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 15px;
+        }
+        .comment-item {
+            border-bottom: 1px solid #eee;
+            padding: 15px 0;
+        }
+        .comment-item:last-child {
+            border-bottom: none;
+        }
+        .comment-item p {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        .comment-item p strong {
+            color: #333;
+        }
+        .no-comments {
+            text-align: center;
+            font-size: 18px;
+            color: #666;
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
 <div th:replace="fragments/sidebar :: sidebar"></div>
-<form th:action="@{/products/list/search/{name}(name=${query})}" method="GET">
-    <input type="text" name="query" placeholder="Введите название продукта" />
-    <br />
-    <button type="submit">Искать</button>
-</form>
+<div class="content">
+    <div>
+        <form th:action="@{/products/list/search}" method="GET">
+            <input type="text" name="query" placeholder="Введите название продукта..." />
+            <button type="submit">Искать</button>
+        </form>
+    </div>
 
-<div>
-    <img th:src="'data:image/png;base64,' + ${product.image}" alt="Product Image" width="200"/>
-</div>
-<div>
-    <h1 th:text="${product.name}">Название продукта</h1>
-    <p><strong>Описание:</strong> <span th:text="${product.description}">Описание продукта</span></p>
-    <p><strong>Цена:</strong> <span th:text="${product.price}">Цена продукта</span> ₽</p>
-    <p><strong>Категория:</strong> <span th:text="${product.category.name}">Категория продукта</span></p>
-</div>
-<h2>Добавить комментарии</h2>
-<form th:action="@{/products/create_comment}" th:object="${new_comment}" method="post">
-    <label>
-        <textarea th:field="*{text}" placeholder="Оставьте комментарий"></textarea>
-    </label>
-    <button type="submit">Отправить</button>
-</form>
-
-<h2>Комментарии</h2>
-<div th:if="${isComment}">
-    <th:block th:each="comment : ${comments}">
+    <!-- Информация о продукте -->
+    <div class="product-info">
         <div>
-            <p><strong>Имя:</strong> <span th:text="${comment.user.login}">Имя</span></p>
-            <p><strong>комент:</strong> <span th:text="${comment.text}">text</span></p>
+            <img th:src="'data:image/png;base64,' + ${product.image}" alt="Product Image" />
         </div>
-    </th:block>
-</div>
-<div th:if="${isComment == false}">
-    <p>Комментарии не найдены.</p>
+        <div>
+            <h1 th:text="${product.name}">Название продукта</h1>
+            <p><strong>Описание:</strong> <span th:text="${product.description}">Описание продукта</span></p>
+            <p><strong>Цена:</strong> <span th:text="${product.price}">Цена продукта</span> ₽</p>
+            <p><strong>Категория:</strong> <span th:text="${product.category.name}">Категория продукта</span></p>
+        </div>
+    </div>
+
+    <!-- Форма добавления комментария -->
+    <div class="comment-form">
+        <h2>Добавить комментарии</h2>
+        <form th:action="@{/products/create_comment}" th:object="${new_comment}" method="post">
+            <label>
+                <textarea th:field="*{text}" placeholder="Оставьте комментарий"></textarea>
+            </label>
+            <button type="submit">Отправить</button>
+        </form>
+    </div>
+
+    <!-- Список комментариев -->
+    <div class="comments-section">
+        <h2>Комментарии</h2>
+        <div th:if="${isComment}">
+            <th:block th:each="comment : ${comments}">
+                <div class="comment-item">
+                    <p><strong>Имя:</strong> <span th:text="${comment.user.login}">Имя</span></p>
+                    <p><strong>Комментарий:</strong> <span th:text="${comment.text}">text</span></p>
+                </div>
+            </th:block>
+        </div>
+        <div th:if="${isComment == false}">
+            <p class="no-comments">Комментарии не найдены.</p>
+        </div>
+    </div>
 </div>
 </body>
 </html>
