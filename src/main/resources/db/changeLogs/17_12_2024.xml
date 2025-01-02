@@ -84,6 +84,24 @@
         </sql>
     </changeSet>
 
+    <changeSet id="comments" author="JekiChan08">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="comments"/>
+            </not>
+        </preConditions>
+        <sql>
+            create table comments
+            (
+                id varchar primary key unique,
+                product_id varchar references products,
+                user_id varchar references  users,
+                text varchar(500),
+                created_at timestamp default now()
+            );
+        </sql>
+    </changeSet>
+
 
     <changeSet id="6" author="JekiChan08">
         <loadData tableName="roles" file="data/roles.csv" relativeToChangelogFile="true" separator=";"/>
@@ -95,4 +113,5 @@
     <changeSet id="10" author="JekiChan08">
         <loadData tableName="users_roles" file="data/users_roles.csv" relativeToChangelogFile="true" separator=";"/>
     </changeSet>
+
 </databaseChangeLog>
