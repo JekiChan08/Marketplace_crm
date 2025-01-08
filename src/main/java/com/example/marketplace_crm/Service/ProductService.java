@@ -14,5 +14,6 @@ public interface ProductService {
     List<Product> getAllProduct();
     Product findByName(String name);
     List<Product> findByNameContaining(String name);
+    double calculateAverageRating(String productId);
     //Product addProduct(Product product, MultipartFile file) throws IOException ;
 }

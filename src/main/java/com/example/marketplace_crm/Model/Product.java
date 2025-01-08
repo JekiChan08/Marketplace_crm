@@ -2,8 +2,9 @@ package com.example.marketplace_crm.Model;
 
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Data;
+
+import java.util.List;
 
 @Entity
 @Data
@@ -19,6 +20,8 @@ public class Product {
     private double price;
     @Column(name = "description")
     private String description;
+    @Column(name = "rating")
+    private double averageRating;
 
     @ManyToOne
     @JoinColumn(name = "category_id")
@@ -27,8 +30,7 @@ public class Product {
     @Column(name = "image")
     private String image;
 
-
-    public Product() {
-
-    }
+    @OneToMany(mappedBy = "product",cascade = CascadeType.ALL,orphanRemoval = true)//связь один ко многим.связь продукта и рейтинга (если удалить продукт удаляется и все его оценки)
+    private List<Rating> ratings;
+    public Product() { }
 }

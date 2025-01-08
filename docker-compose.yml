@@ -20,7 +20,7 @@ services:
     container_name: db
     environment:
       - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=ac
+      - POSTGRES_PASSWORD=1234
       - POSTGRES_DB=marketplace
     ports:
       - "5433:5432"

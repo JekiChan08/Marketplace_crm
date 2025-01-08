@@ -175,7 +175,19 @@
             <p><strong>Категория:</strong> <span th:text="${product.category.name}">Категория продукта</span></p>
         </div>
     </div>
-
+    <!-- Секция рейтинга -->
+    <div class="rating-section">
+        <h2>Рейтинг продукта</h2>
+        <p><strong>Средняя оценка:</strong> <span class="average-rating" th:text="${product.averageRating}">0</span>/10</p>
+        <form th:action="@{'/products/' + ${product.id} + '/rate'}" method="post" class="rating-form">
+            <label for="ratingValue">Оценка:</label>
+            <select id="ratingValue" name="ratingValue">
+                <option th:each="i : ${#numbers.sequence(1,10)}" th:value="${i}" th:text="${i}">1</option>
+            </select>
+            <button type="submit">Оценить</button>
+        </form>
+    </div>
+</div>
     <!-- Форма добавления комментария -->
     <div class="comment-form">
         <h2>Добавить комментарии</h2>
@@ -186,7 +198,6 @@
             <button type="submit">Отправить</button>
         </form>
     </div>
-
     <!-- Список комментариев -->
     <div class="comments-section">
         <h2>Комментарии</h2>

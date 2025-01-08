@@ -1,6 +1,7 @@
 package com.example.marketplace_crm.Service.Impl;
 
 import com.example.marketplace_crm.Model.Product;
+import com.example.marketplace_crm.Model.Rating;
 import com.example.marketplace_crm.Repositories.ProductRepository;
 import com.example.marketplace_crm.Service.ProductService;
 import lombok.Data;
@@ -48,5 +49,21 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public List<Product> findByNameContaining(String name) {
         return productRepository.findByNameContaining(name);
+    }
+
+    @Override
+    public double calculateAverageRating(String productId) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("Продукт не сушествует"));
+        List<Rating> ratings = product.getRatings();
+        double ratingAverage = (ratings == null || ratings.isEmpty()) ? 0.0 :
+                ratings.stream()
+                        .mapToInt(Rating::getRating)
+                        .average().orElse(0.0);
+        product.setAverageRating(ratingAverage);
+
+        productRepository.save(product);
+
+        return ratingAverage;
     }
 }

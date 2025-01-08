@@ -3,10 +3,7 @@ package com.example.marketplace_crm.controller;
 import com.example.marketplace_crm.Model.Comment;
 import com.example.marketplace_crm.Model.Product;
 import com.example.marketplace_crm.Model.User;
-import com.example.marketplace_crm.Service.CategoryService;
-import com.example.marketplace_crm.Service.CommentService;
-import com.example.marketplace_crm.Service.ProductService;
-import com.example.marketplace_crm.Service.UserService;
+import com.example.marketplace_crm.Service.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -25,6 +22,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 import java.util.Base64;
@@ -44,6 +42,8 @@ public class ProductController {
     private final CommentService commentsService;
     @Autowired
     private final UserService userService;
+    @Autowired
+    private final RatingService ratingService;
 
     @Operation(
             summary = "Получить продукт по ID",
@@ -196,8 +196,7 @@ public class ProductController {
             responses = {
                     @ApiResponse(responseCode = "200", description = "Изображение найдено", content = @Content(schema = @Schema(type = "string"))),
                     @ApiResponse(responseCode = "404", description = "Изображение не найдено")
-            }
-    )
+            })
     @GetMapping("/{id}/image")
     public ResponseEntity<String> getProductImage(
             @Parameter(description = "ID продукта", required = true) @PathVariable String id
@@ -209,5 +208,29 @@ public class ProductController {
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+    }
+    @Operation(
+            summary = "Добавить рейтинг продукту",
+            description = "Позволяет пользователю добавить рейтинг продукту от 1 до 10",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Рейтинг добавлен"),
+                    @ApiResponse(responseCode = "400", description = "Некорректные данные")
+            }
+    )
+    @PostMapping("/{id}/rate")
+    public String addRating(
+            @Parameter(description = "ID продукта", required = true)@PathVariable String id,
+            @Parameter(description = "Рейтинг от 1 до 10", required = true) @PathVariable Integer ratingValue,
+            RedirectAttributes redirectAttributes
+    ){
+    try {
+        ratingService.addRating(id, ratingValue);
+        redirectAttributes.addFlashAttribute("SuccessMessage", "Рейтинг успешно добавлен");
+    }catch (IllegalArgumentException ex) {
+        redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
+    }catch (RuntimeException rx){
+        redirectAttributes.addFlashAttribute("errorMessage","Ошибка "+ rx.getMessage());
+    }
+    return "redirect:/products/"+id;
     }
 }
