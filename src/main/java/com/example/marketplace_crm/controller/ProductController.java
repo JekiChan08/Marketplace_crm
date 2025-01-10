@@ -152,7 +152,7 @@ public class ProductController {
     @GetMapping("/list")
     public String getAllProducts(Model model) {
         List<Product> products = productService.getAllProduct();
-        if (products != null) {
+        if (!products.isEmpty()) {
             model.addAttribute("isProduct", true);
             model.addAttribute("products", products);
             model.addAttribute("all_categories", categoryService.getAllCategory());
@@ -179,7 +179,7 @@ public class ProductController {
     ) {
         if (query != null && !query.isEmpty()) {
             List<Product> products = productService.findByNameContaining(query);
-            if (products != null && !products.isEmpty()) {
+            if (!products.isEmpty()) {
                 model.addAttribute("isProduct", true);
                 model.addAttribute("products", products);
             } else {

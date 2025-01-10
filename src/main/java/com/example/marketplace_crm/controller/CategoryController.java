@@ -82,7 +82,7 @@ public class CategoryController {
             category.setImage(encodedImage);
         }
         categoryService.saveCategory(category);
-        return "redirect:/categories/add";
+        return "redirect:/categories/create";
     }
 
     @Operation(

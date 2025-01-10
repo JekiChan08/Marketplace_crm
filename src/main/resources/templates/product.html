@@ -163,7 +163,6 @@
         </form>
     </div>
 
-    <!-- Информация о продукте -->
     <div class="product-info">
         <div>
             <img th:src="'data:image/png;base64,' + ${product.image}" alt="Product Image" />
@@ -171,12 +170,14 @@
         <div>
             <h1 th:text="${product.name}">Название продукта</h1>
             <p><strong>Описание:</strong> <span th:text="${product.description}">Описание продукта</span></p>
-            <p><strong>Цена:</strong> <span th:text="${product.price}">Цена продукта</span> ₽</p>
+            <p><strong>Цена:</strong> <span th:text="${product.price}">Цена продукта</span> Сом</p>
             <p><strong>Категория:</strong> <span th:text="${product.category.name}">Категория продукта</span></p>
         </div>
     </div>
+    <form th:action="@{/orders/{id}(id=${product.id})}" method="post">
+        <button type="submit">Заказать</button>
+    </form>
 
-    <!-- Форма добавления комментария -->
     <div class="comment-form">
         <h2>Добавить комментарии</h2>
         <form th:action="@{/products/create_comment}" th:object="${new_comment}" method="post">
@@ -187,7 +188,6 @@
         </form>
     </div>
 
-    <!-- Список комментариев -->
     <div class="comments-section">
         <h2>Комментарии</h2>
         <div th:if="${isComment}">
