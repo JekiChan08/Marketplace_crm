@@ -135,8 +135,9 @@ public class ProductController {
 
         comment.setProduct(product);
         comment.setUser(user);
-
-        commentsService.saveComment(comment);
+        if(comment.getText() != null && !comment.getText().isEmpty()) {
+            commentsService.saveComment(comment);
+        }
 
         return "redirect:/products/" + product_id;
     }
