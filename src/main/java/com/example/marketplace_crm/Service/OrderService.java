@@ -9,4 +9,5 @@ public interface OrderService {
     Order saveOrder(Order order);
     void deleteOrderById(String id);
     List<Order> getAllOrders();
+    List<Order> getAllOrdersIfActive();
 }

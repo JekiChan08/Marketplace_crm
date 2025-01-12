@@ -1,6 +1,6 @@
 services:
   app:
-    image: 'db-demo'
+    image: 'marketplace'
     build:
       context: .
     container_name: app
@@ -9,9 +9,9 @@ services:
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=ac
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/marketplace
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/marketplace2
       - SPRING_DATASOURCE_USERNAME=postgres
-      - SPRING_DATASOURCE_PASSWORD=ac
+      - SPRING_DATASOURCE_PASSWORD=1212
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
     ports:
       - "6868:8080"
@@ -20,7 +20,7 @@ services:
     container_name: db
     environment:
       - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=ac
-      - POSTGRES_DB=marketplace
+      - POSTGRES_PASSWORD=1212
+      - POSTGRES_DB=marketplace2
     ports:
       - "5433:5432"

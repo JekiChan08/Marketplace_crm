@@ -31,19 +31,22 @@ import java.util.Base64;
 import java.util.List;
 
 @Tag(name = "Product Controller", description = "Управление продуктами")
-@RequiredArgsConstructor
 @Controller
 @Data
 @RequestMapping("/products")
 public class ProductController {
-    @Autowired
     private final ProductService productService;
-    @Autowired
     private final CategoryService categoryService;
-    @Autowired
     private final CommentService commentsService;
-    @Autowired
     private final UserService userService;
+
+
+    public ProductController(ProductService productService, CategoryService categoryService, CommentService commentsService, UserService userService) {
+        this.productService = productService;
+        this.categoryService = categoryService;
+        this.commentsService = commentsService;
+        this.userService = userService;
+    }
 
     @Operation(
             summary = "Получить продукт по ID",

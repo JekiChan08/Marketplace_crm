@@ -1,6 +1,8 @@
 package com.example.marketplace_crm.Service.Impl;
 
+import com.example.marketplace_crm.Model.Order;
 import com.example.marketplace_crm.Model.User;
+import com.example.marketplace_crm.Repositories.OrderRepository;
 import com.example.marketplace_crm.Repositories.RoleRepository;
 import com.example.marketplace_crm.Repositories.UserRepository;
 import com.example.marketplace_crm.Service.UserService;
@@ -20,6 +22,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final OrderRepository orderRepository;
     @Override
     public User findById(String id) {
         return userRepository.findById(id).orElse(null);
@@ -37,7 +40,6 @@ public class UserServiceImpl implements UserService {
     public User findByLogin(String login) {
         return userRepository.findByLogin(login).orElse(null);
     }
-
     @Override
     public User saveUser(User myUser) {
         if (!userRepository.findByLogin(myUser.getLogin()).isPresent()) {
@@ -47,6 +49,11 @@ public class UserServiceImpl implements UserService {
         }else {
             return null;
         }
+    }
+
+    @Override
+    public List<Order> ordersByUser(User user) {
+        return userRepository.ordersByUser(user);
     }
 
 }

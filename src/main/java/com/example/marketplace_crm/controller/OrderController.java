@@ -26,13 +26,16 @@ import java.util.List;
 @Data
 @RequestMapping("/orders")
 public class OrderController {
-    @Autowired
     private final ProductService productService;
-    @Autowired
     private final OrderService orderService;
-    @Autowired
     private final UserService userService;
 
+
+    public OrderController(ProductService productService, OrderService orderService, UserService userService) {
+        this.productService = productService;
+        this.orderService = orderService;
+        this.userService = userService;
+    }
 
     @PostMapping("/create_order")
     public String createOrder(@ModelAttribute Order order) {
