@@ -10,8 +10,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -24,15 +22,17 @@ import java.util.Base64;
 import java.util.List;
 
 @Tag(name = "Category Controller", description = "Управление категориями")
-@RequiredArgsConstructor
 @Controller
 @Data
 @RequestMapping("/categories")
 public class CategoryController {
-    @Autowired
     private final ProductService productService;
-    @Autowired
     private final CategoryService categoryService;
+
+    public CategoryController(ProductService productService, CategoryService categoryService) {
+        this.productService = productService;
+        this.categoryService = categoryService;
+    }
 
     @Operation(
             summary = "Получить категорию по ID",

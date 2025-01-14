@@ -19,5 +19,27 @@
             )
         </sql>
     </changeSet>
+    <changeSet id="add-column-status-in-orders" author="JekiChan08">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="orders" columnName="status"/>
+            </not>
+        </preConditions>
+        <sql>
+            alter table orders
+                add column status varchar
+        </sql>
+    </changeSet>
+    <changeSet id="add-column-delivery-in-orders" author="JekiChan08">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="orders" columnName="delivery"/>
+            </not>
+        </preConditions>
+        <sql>
+            alter table orders
+                add column delivery varchar references users;
+        </sql>
+    </changeSet>
 
 </databaseChangeLog>

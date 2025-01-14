@@ -24,4 +24,11 @@ public class Order {
 
     @Column(name = "created_at", nullable = false, insertable = false, updatable = false)
     private LocalDateTime createdAt;
+
+    @Column(name = "status")
+    private String status;
+
+    @OneToOne
+    @JoinColumn(name = "delivery")
+    private User delivery;
 }

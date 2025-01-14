@@ -20,13 +20,17 @@ public class SecurityConfig {
         this.myUserDetailService = myUserDetailService;
         this.encoderConfig = encoderConfig;
     }
-
+    // Все роли
+    // 1-USER
+    // 2-ADMIN
+    // 3-DELIVERY
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
     return httpSecurity
             .httpBasic().disable()
             .csrf().disable()
             .authorizeHttpRequests(auths -> auths
+                    .requestMatchers("/delivery_panel").hasAnyRole("ADMIN", "DELIVERY", "USER")
                     .requestMatchers("/products/**", "/users/**", "/categories/**", "/orders/**").hasAnyRole("USER", "ADMIN")
                     .requestMatchers("/auth/**").permitAll()
                     .requestMatchers("/css/**", "/images/**").permitAll()

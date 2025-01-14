@@ -18,7 +18,7 @@ import java.util.List;
 @Data
 public class ProductServiceImpl implements ProductService {
     @Autowired
-    private ProductRepository productRepository;
+    private final ProductRepository productRepository;
 
     @Override
     public Product findById(String Id) {
