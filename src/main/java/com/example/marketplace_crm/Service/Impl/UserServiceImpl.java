@@ -19,6 +19,7 @@ import java.util.List;
 public class UserServiceImpl implements UserService {
     private final String USER_ROLE_ID = "1";
     private final String ADMIN_ROLE_ID = "2";
+    private final String DELIVERY_ROLE_ID = "3";
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;

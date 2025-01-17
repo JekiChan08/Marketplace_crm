@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin-Панеличко</title>
+</head>
+<body>
+<div th:replace="fragments/sidebar :: sidebar"></div>
+<a th:href="@{/admin/}">Админка</a>
+
+
+<div>
+  <ul>
+    <a th:href="@{/admin/products/create}"><li>Создание вкусностей</li></a>
+    <a th:href="@{/admin/products/edit}"><li>Редактирование вкусностей</li></a>
+    <a th:href="@{/admin/categories/edit}"><li>Редактирование категорий</li></a>
+    <a th:href="@{/admin/categories/create}"><li>Создание категорий</li></a>
+
+  </ul>
+</div>
+</body>
+</html>

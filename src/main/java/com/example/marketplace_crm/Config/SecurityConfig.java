@@ -30,9 +30,11 @@ public class SecurityConfig {
             .httpBasic().disable()
             .csrf().disable()
             .authorizeHttpRequests(auths -> auths
-                    .requestMatchers("/delivery_panel").hasAnyRole("ADMIN", "DELIVERY", "USER")
-                    .requestMatchers("/products/**", "/users/**", "/categories/**", "/orders/**").hasAnyRole("USER", "ADMIN")
+                    .requestMatchers("/admin/**").hasAnyRole("ADMIN")
+                    .requestMatchers("/delivery_panel/**").hasAnyRole("ADMIN", "DELIVERY")
+                    .requestMatchers("/products/**", "/users/**", "/categories/**", "/orders/**").hasAnyRole("USER", "ADMIN", "DELIVERY")
                     .requestMatchers("/auth/**").permitAll()
+                    .requestMatchers("/").permitAll()
                     .requestMatchers("/css/**", "/images/**").permitAll()
                     .anyRequest().authenticated()
             )

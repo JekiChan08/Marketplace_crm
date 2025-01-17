@@ -122,7 +122,7 @@
                     </div>
                     <div>
                         <h1 th:text="${product.name}">Название продукта</h1>
-                        <p><strong>Цена:</strong> <span th:text="${product.price}">Цена продукта</span> ₽</p>
+                        <p><strong>Цена:</strong> <span th:text="${product.price}">Цена продукта</span> сом</p>
                         <p><strong>Категория:</strong> <span th:text="${product.category.name}">Категория продукта</span></p>
                     </div>
                     <form th:action="@{/products/{id}(id=${product.id})}" method="get">

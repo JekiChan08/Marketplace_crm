@@ -53,37 +53,6 @@ public class CategoryController {
         return "category";
     }
 
-    @Operation(
-            summary = "Страница создания категории",
-            description = "Возвращает страницу для создания новой категории"
-    )
-    @GetMapping("/create")
-    public String add(Model model) {
-        model.addAttribute("new_category", new Category());
-        return "create-category";
-    }
-
-    @Operation(
-            summary = "Создать новую категорию",
-            description = "Создает новую категорию с изображением",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Категория успешно создана"),
-                    @ApiResponse(responseCode = "400", description = "Неверные данные")
-            }
-    )
-    @PostMapping("/create")
-    public String addCategory(
-            @Parameter(description = "Данные категории", required = true) @ModelAttribute Category category,
-            @Parameter(description = "Изображение категории", required = true) @RequestParam("imageFile") MultipartFile imageFile
-    ) throws IOException {
-        if (!imageFile.isEmpty()) {
-            byte[] imageBytes = imageFile.getBytes();
-            String encodedImage = Base64.getEncoder().encodeToString(imageBytes);
-            category.setImage(encodedImage);
-        }
-        categoryService.saveCategory(category);
-        return "redirect:/categories/create";
-    }
 
     @Operation(
             summary = "Получить все категории",

@@ -7,9 +7,12 @@
 </head>
 <body>
 <div th:replace="fragments/sidebar :: sidebar"></div>
+<a th:href="@{/admin/}">Админка</a>
+
+
 <h1>Добавить категорию</h1>
 
-<form th:action="@{/categories/create}" th:object="${new_category}" method="post" enctype="multipart/form-data">
+<form th:action="@{/admin/categories/create}" th:object="${new_category}" method="post" enctype="multipart/form-data">
     <label for="name">Название категории:</label>
     <input type="text" id="name" name="name" th:field="*{name}" required>
     <br><br>
