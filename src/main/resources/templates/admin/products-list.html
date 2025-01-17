@@ -23,6 +23,10 @@
                 <form th:action="@{/admin/products/edit/{id}(id=${product.id})}" method="get">
                     <button type="submit">Редактировать продукт</button>
                 </form>
+                <form th:action="@{/admin/products/delete/{id}(id=${product.id})}" method="post">
+                    <input type="hidden" name="_method" value="delete"/>
+                    <button type="submit">Удаление продукта</button>
+                </form>
 
             </li>
         </th:block>

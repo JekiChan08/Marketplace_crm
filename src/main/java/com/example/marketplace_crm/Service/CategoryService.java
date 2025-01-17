@@ -15,4 +15,5 @@ public interface CategoryService {
     List<Category> getAllCategory();
     Category findByName(String name);
 //    Category addCategory(Category category, MultipartFile file) throws IOException;
+    List<Category> findAllDeActive();
 }

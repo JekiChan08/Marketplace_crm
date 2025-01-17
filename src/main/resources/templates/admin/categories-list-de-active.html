@@ -21,6 +21,12 @@
             <form th:action="@{/admin/categories/edit/{id}(id=${category.id})}" method="get">
                 <button type="submit">Редактировать категорий</button>
             </form>
+            <form th:action="@{/admin/categories/restore/{id}(id=${category.id})}" method="post">
+                <button type="submit">Восстанавить категорию</button>
+            </form>
+            <form th:action="@{/admin/categories/restore_all_product/{id}(id=${category.id})}" method="post">
+                <button type="submit">Восстанавить категорию вместе со всеми продуктами</button>
+            </form>
 
         </li>
     </th:block>

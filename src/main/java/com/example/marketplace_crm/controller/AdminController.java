@@ -17,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.Base64;
+import java.util.List;
 
 @Controller
 @Data
@@ -39,14 +40,16 @@ public class AdminController {
         return "admin/main-panel";
     }
 
-    @GetMapping("/products/edit")
+    //Логика изменения оюъектов от Джеки чана
+
+    @GetMapping("/products/list")
     public String editProduct(Model model) {
         model.addAttribute("products", productService.getAllProduct()
         );
-        return "admin/product-edit";
+        return "admin/products-list";
     }
     @PostMapping("/products/edit/{id}")
-    public String editProduct(@PathVariable String id, Model model,
+    public String editProduct(@PathVariable String id,
                               @Parameter(description = "Данные продукта", required = true) @ModelAttribute Product product,
                               @Parameter(description = "Изображение продукта", required = true) @RequestParam("imageFile") MultipartFile imageFile) throws IOException {
             if (!imageFile.isEmpty()) {
@@ -62,7 +65,7 @@ public class AdminController {
                 product.setCategory(oldProduct.getCategory());
             }
             productService.saveProduct(product);
-        return "redirect:/admin/products/edit";
+        return "redirect:/admin/products/list";
     }
     @GetMapping("/products/edit/{id}")
     public String editProductForm(Model model, @PathVariable String id) {
@@ -74,14 +77,14 @@ public class AdminController {
     }
 
 
-    @GetMapping("/categories/edit")
+    @GetMapping("/categories/list")
     public String editCategory(Model model) {
         model.addAttribute("categories", categoryService.getAllCategory()
         );
-        return "admin/category-edit";
+        return "admin/categories-list";
     }
     @PostMapping("/categories/edit/{id}")
-    public String editCategory(@PathVariable String id, Model model,
+    public String editCategory(@PathVariable String id,
                               @Parameter(description = "Данные категории", required = true) @ModelAttribute Category category,
                               @Parameter(description = "Изображение категории", required = true) @RequestParam("imageFile") MultipartFile imageFile) throws IOException {
         if (!imageFile.isEmpty()) {
@@ -95,7 +98,7 @@ public class AdminController {
         }
 
         categoryService.saveCategory(category);
-        return "redirect:/admin/categories/edit";
+        return "redirect:/admin/categories/list";
     }
     @GetMapping("/categories/edit/{id}")
     public String editCategoryForm(Model model, @PathVariable String id) {
@@ -105,7 +108,7 @@ public class AdminController {
         return "admin/category-edit-form";
     }
 
-
+    //Логика создания объектов от Джеки чана
 
     @Operation(
             summary = "Страница создания продукта",
@@ -173,5 +176,62 @@ public class AdminController {
         return "redirect:/admin/categories/create";
     }
 
+    //Логика удаления от Джеки чана
+
+    @DeleteMapping("/products/delete/{id}")
+    public String deleteProduct(@PathVariable String id){
+        Product product = productService.findById(id);
+        product.setDeleted(true);
+        productService.saveProduct(product);
+        return "redirect:/admin/products/list";
+    }
+    @DeleteMapping("/categories/delete/{id}")
+    public String deleteCategory(@PathVariable String id){
+        Category category = categoryService.findById(id);
+        category.setDeleted(true);
+        productService.deActiveProductByCategory(category);
+        categoryService.saveCategory(category);
+        return "redirect:/admin/categories/list";
+    }
+
+
+    //Логика получения, востонавление неактивных объектов от Джеки чана
+
+    @GetMapping("/products/list_de_active")
+    public String deActiveProductList(Model model) {
+        List<Product> products = productService.findAllDeActive();
+        model.addAttribute("products", products);
+        return "admin/product-list-de-active";
+    }
+    @GetMapping("/categories/list_de_active")
+    public String deActiveCategoriesList(Model model) {
+        List<Category> categories = categoryService.findAllDeActive();
+        model.addAttribute("categories", categories);
+        return "admin/categories-list-de-active";
+    }
+    @PostMapping("/products/restore/{id}")
+    public String restoreProduct(@PathVariable String id){
+        Product product = productService.findById(id);
+        product.setDeleted(false);
+        productService.saveProduct(product);
+        return "redirect:/admin/products/list_de_active";
+    }
+
+    @PostMapping("/categories/restore/{id}")
+    public String restoreCategory(@PathVariable String id){
+        Category category = categoryService.findById(id);
+        category.setDeleted(false);
+        categoryService.saveCategory(category);
+        return "redirect:/admin/categories/list_de_active";
+    }
+
+    @PostMapping("/categories/restore_all_product/{id}")
+    public String restoreCategoryAdnAllProductIsCategory(@PathVariable String id){
+        Category category = categoryService.findById(id);
+        category.setDeleted(false);
+        productService.activeProductByCategory(category);
+        categoryService.saveCategory(category);
+        return "redirect:/admin/categories/list_de_active";
+    }
 
 }

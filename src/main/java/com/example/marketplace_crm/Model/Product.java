@@ -13,9 +13,9 @@ public class Product {
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
-    @Column(name = "name")
+    @Column(name = "name", nullable = false)
     private String name;
-    @Column(name = "price")
+    @Column(name = "price", nullable = false)
     private double price;
     @Column(name = "description")
     private String description;
@@ -26,6 +26,9 @@ public class Product {
 
     @Column(name = "image")
     private String image;
+
+    @Column(name = "is_deleted", nullable = false)
+    private boolean isDeleted;
 
 
     public Product() {
