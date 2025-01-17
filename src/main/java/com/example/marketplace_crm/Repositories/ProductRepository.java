@@ -1,5 +1,6 @@
 package com.example.marketplace_crm.Repositories;
 
+import com.example.marketplace_crm.Model.Category;
 import com.example.marketplace_crm.Model.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -15,4 +16,11 @@ public interface ProductRepository extends JpaRepository<Product, String> {
     @Query("SELECT p FROM Product p WHERE p.name LIKE %:name%")
     List<Product> findByNameContaining(@Param("name") String name);
 
+    @Query("SELECT p FROM Product p WHERE p.category = :category")
+    List<Product> findByCategory(@Param("category") Category category);
+
+    @Query("SELECT p FROM Product p WHERE p.isDeleted = false")
+    List<Product> findAllActive();
+    @Query("SELECT p FROM Product p WHERE p.isDeleted = true ")
+    List<Product> findAllDeActive();
 }

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Редактирование категорий</title>
+</head>
+<body>
+
+<div th:replace="fragments/sidebar :: sidebar"></div>
+<a th:href="@{/admin/}">Админка</a>
+
+<ul>
+    <th:block th:each="category : ${categories}">
+        <li class="product-item">
+            <div>
+                <img th:src="'data:image/png;base64,' + ${category.image}" alt="Product Image" />
+            </div>
+            <div>
+                <h1 th:text="${category.name}">Название продукта</h1>
+            </div>
+            <form th:action="@{/admin/categories/edit/{id}(id=${category.id})}" method="get">
+                <button type="submit">Редактировать категорий</button>
+            </form>
+            <form th:action="@{/admin/categories/restore/{id}(id=${category.id})}" method="post">
+                <button type="submit">Восстанавить категорию</button>
+            </form>
+            <form th:action="@{/admin/categories/restore_all_product/{id}(id=${category.id})}" method="post">
+                <button type="submit">Восстанавить категорию вместе со всеми продуктами</button>
+            </form>
+
+        </li>
+    </th:block>
+</ul>
+</body>
+</html>

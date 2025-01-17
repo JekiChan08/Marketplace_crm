@@ -83,38 +83,7 @@ public class ProductController {
         return "product";
     }
 
-    @Operation(
-            summary = "Страница создания продукта",
-            description = "Возвращает страницу для создания нового продукта"
-    )
-    @GetMapping("/create")
-    public String create(Model model) {
-        model.addAttribute("new_product", new Product());
-        model.addAttribute("all_categories", categoryService.getAllCategory());
-        return "create-product";
-    }
 
-    @Operation(
-            summary = "Создать новый продукт",
-            description = "Создает новый продукт с изображением",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Продукт успешно создан"),
-                    @ApiResponse(responseCode = "400", description = "Неверные данные")
-            }
-    )
-    @PostMapping("/create")
-    public String createProduct(
-            @Parameter(description = "Данные продукта", required = true) @ModelAttribute Product product,
-            @Parameter(description = "Изображение продукта", required = true) @RequestParam("imageFile") MultipartFile imageFile
-    ) throws IOException {
-        if (!imageFile.isEmpty()) {
-            byte[] imageBytes = imageFile.getBytes();
-            String encodedImage = Base64.getEncoder().encodeToString(imageBytes);
-            product.setImage(encodedImage);
-        }
-        productService.saveProduct(product);
-        return "redirect:/products/create";
-    }
 
     @Operation(
             summary = "Создать комментарий",
