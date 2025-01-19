@@ -1,26 +1,31 @@
+version: '3.8'
+
 services:
   app:
-    image: 'marketplace'
     build:
       context: .
-    container_name: app
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./templates:/app/src/main/resources/templates
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/marketplace2
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: 1212
     depends_on:
       - db
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=ac
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/marketplace2
-      - SPRING_DATASOURCE_USERNAME=postgres
-      - SPRING_DATASOURCE_PASSWORD=1212
-      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
-    ports:
-      - "6868:8080"
+
   db:
-    image: postgres
-    container_name: db
+    image: postgres:15
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=1212
       - POSTGRES_DB=marketplace2
     ports:
-      - "5433:5432"
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+volumes:
+  db_data:
