@@ -9,8 +9,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -48,6 +46,10 @@ public class UserController {
         return "user";
     }
 
+    @Operation(
+            summary = "Получить заказы текущего пользователя",
+            description = "Возвращает список заказов для авторизованного пользователя"
+    )
     @GetMapping("/my_orders")
     public String myOrders(Model model) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -57,6 +59,11 @@ public class UserController {
         model.addAttribute("orders", us.ordersByUser(user));
         return "order-list-user";
     }
+
+    @Operation(
+            summary = "Деактивировать заказ",
+            description = "Изменяет статус заказа на 'de_active'"
+    )
     @PostMapping("/de_active_order/{id}")
     public String deActiveOrder(Model model, @PathVariable String id) {
         Order order = os.findById(id);
@@ -64,5 +71,4 @@ public class UserController {
         os.saveOrder(order);
         return "redirect:/users/my_orders";
     }
-
 }
