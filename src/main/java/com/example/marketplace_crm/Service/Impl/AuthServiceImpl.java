@@ -3,18 +3,15 @@ package com.example.marketplace_crm.Service.Impl;
 import com.example.marketplace_crm.Config.EncoderConfig;
 import com.example.marketplace_crm.Config.JWTAuth;
 import com.example.marketplace_crm.Config.JWTConfig;
-import com.example.marketplace_crm.Config.SecurityConfig;
 import com.example.marketplace_crm.Model.User;
 import com.example.marketplace_crm.controller.Requests.AccessRequest;
 import com.example.marketplace_crm.controller.Requests.JwtRequest;
 import com.example.marketplace_crm.controller.Responses.JwtResponse;
 import com.example.marketplace_crm.Service.UserService;
-import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import jakarta.security.auth.message.AuthException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-
 import java.util.HashMap;
 import java.util.Map;
 

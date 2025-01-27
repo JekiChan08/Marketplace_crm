@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.6.xsd">
+
+    <!-- 1. Создание таблицы ratings -->
+    <changeSet id="2" author="Baiysh">
+        <sql>
+            CREATE TABLE ratings (
+            id VARCHAR(255) PRIMARY KEY,
+            product_id VARCHAR(255) NOT NULL,
+            user_id VARCHAR(255) NOT NULL,
+            rating INTEGER,
+            CONSTRAINT unique_user_product UNIQUE (user_id, product_id),
+            CONSTRAINT fk_product FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
+            CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+            );
+        </sql>
+    </changeSet>
+    <changeSet id="3" author="Baiysh">
+        <sql>
+            ALTER TABLE products
+            ADD COLUMN average_rating NUMERIC(3,2);
+        </sql>
+    </changeSet>
+</databaseChangeLog>

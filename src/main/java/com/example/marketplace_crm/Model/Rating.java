@@ -7,7 +7,8 @@ import lombok.NoArgsConstructor;
 @Entity
 @NoArgsConstructor
 @Data
-@Table(name = "ratings",uniqueConstraints = {@UniqueConstraint(columnNames = {"user_id","product_id"})})//уникальность пары user_id и product_id
+@Table(name = "ratings",uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"user_id","product_id"})})//уникальность пары user_id и product_id
 public class Rating {
     @Id
     @Column(name = "id")
