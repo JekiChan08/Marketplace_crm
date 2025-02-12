@@ -1,6 +1,7 @@
 package com.example.marketplace_crm.Model;
 
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -21,10 +22,11 @@ public class Product {
     private String description;
 
     @ManyToOne
+    @JsonBackReference
     @JoinColumn(name = "category_id")
     private Category category;
 
-    @Column(name = "image")
+    @Column(name = "image", columnDefinition = "LONGTEXT")
     private String image;
 
     @Column(name = "is_deleted", nullable = false)
