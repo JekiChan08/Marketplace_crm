@@ -8,7 +8,7 @@ import com.example.marketplace_crm.Repositories.UserRepository;
 import com.example.marketplace_crm.Service.UserService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,8 +22,8 @@ public class UserServiceImpl implements UserService {
     private final String DELIVERY_ROLE_ID = "3";
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
-    private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final OrderRepository orderRepository;
+    private final PasswordEncoder passwordEncoder;
     @Override
     public User findById(String id) {
         return userRepository.findById(id).orElse(null);
@@ -44,7 +44,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public User saveUser(User myUser) {
         if (!userRepository.findByLogin(myUser.getLogin()).isPresent()) {
-            myUser.setPassword(bCryptPasswordEncoder.encode(myUser.getPassword()));
+            myUser.setPassword(passwordEncoder.encode(myUser.getPassword()));
             myUser.setRoles(List.of(roleRepository.findById(USER_ROLE_ID).get()));
             return userRepository.save(myUser);
         }else {

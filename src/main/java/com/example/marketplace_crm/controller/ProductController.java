@@ -13,26 +13,18 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpSession;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.util.Base64;
 import java.util.List;
 
 @Tag(name = "Product Controller", description = "Управление продуктами")
-@Controller
-@Data
+@RestController
 @RequestMapping("/products")
 public class ProductController {
     private final ProductService productService;
@@ -40,7 +32,7 @@ public class ProductController {
     private final CommentService commentsService;
     private final UserService userService;
 
-
+    @Autowired
     public ProductController(ProductService productService, CategoryService categoryService, CommentService commentsService, UserService userService) {
         this.productService = productService;
         this.categoryService = categoryService;
@@ -50,40 +42,26 @@ public class ProductController {
 
     @Operation(
             summary = "Получить продукт по ID",
-            description = "Возвращает страницу с информацией о продукте и его комментариями",
+            description = "Возвращает информацию о продукте и его комментарии",
             responses = {
                     @ApiResponse(responseCode = "200", description = "Продукт найден"),
                     @ApiResponse(responseCode = "404", description = "Продукт не найден")
             }
     )
     @GetMapping("/{id}")
-    public String getById(
-            @Parameter(description = "ID продукта", required = true) @PathVariable String id,
-            Model model,
-            HttpSession session
+    public ResponseEntity<ProductResponse> getById(
+            @Parameter(description = "ID продукта", required = true) @PathVariable String id
     ) {
         Product product = productService.findById(id);
-        List<Comment> comments = commentsService.findCommentByProduct(product);
-
-        session.setAttribute("id_product", id);
-
-        Comment comment = new Comment();
-
-        model.addAttribute("new_comment", comment);
-        model.addAttribute("product", product);
-
-        if (comments != null && !comments.isEmpty()) {
-            model.addAttribute("isComment", true);
-            model.addAttribute("comments", comments);
-        } else {
-            model.addAttribute("isComment", false);
-            model.addAttribute("comments", null);
+        if (product == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        return "product";
+        List<Comment> comments = commentsService.findCommentByProduct(product);
+        ProductResponse response = new ProductResponse(product, comments);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
-
-
 
     @Operation(
             summary = "Создать комментарий",
@@ -93,74 +71,64 @@ public class ProductController {
                     @ApiResponse(responseCode = "400", description = "Неверные данные")
             }
     )
-    @PostMapping("/create_comment")
-    public String createComment(
-            @Parameter(description = "Данные комментария", required = true) @ModelAttribute("new_comment") Comment comment,
-            HttpSession session
+    @PostMapping("/{id}/comments")
+    public ResponseEntity<Void> createComment(
+            @Parameter(description = "ID продукта", required = true) @PathVariable String id,
+            @RequestBody CommentRequest commentRequest
     ) {
-        String product_id = (String) session.getAttribute("id_product");
-        Product product = productService.findById(product_id);
+        Product product = productService.findById(id);
+        if (product == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String currentPrincipalName = authentication.getName();
         User user = userService.findByLogin(currentPrincipalName);
 
+        Comment comment = new Comment();
+        comment.setText(commentRequest.getText());
         comment.setProduct(product);
         comment.setUser(user);
-        if(comment.getText() != null && !comment.getText().isEmpty()) {
-            commentsService.saveComment(comment);
-        }
 
-        return "redirect:/products/" + product_id;
+        commentsService.saveComment(comment);
+
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @Operation(
             summary = "Получить все продукты",
-            description = "Возвращает страницу со списком всех продуктов",
+            description = "Возвращает список всех продуктов",
             responses = {
                     @ApiResponse(responseCode = "200", description = "Продукты найдены"),
                     @ApiResponse(responseCode = "404", description = "Продукты не найдены")
             }
     )
     @GetMapping("/list")
-    public String getAllProducts(Model model) {
+    public ResponseEntity<List<Product>> getAllProducts() {
         List<Product> products = productService.getAllProduct();
-        if (!products.isEmpty()) {
-            model.addAttribute("isProduct", true);
-            model.addAttribute("products", products);
-            model.addAttribute("all_categories", categoryService.getAllCategory());
-        } else {
-            model.addAttribute("isProduct", false);
-            model.addAttribute("product", null);
-            model.addAttribute("all_categories", categoryService.getAllCategory());
+        if (products.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return "products";
+        return new ResponseEntity<>(products, HttpStatus.OK);
     }
 
     @Operation(
             summary = "Поиск продуктов по названию",
-            description = "Возвращает страницу с продуктами, найденными по названию",
+            description = "Возвращает список продуктов, найденных по названию",
             responses = {
                     @ApiResponse(responseCode = "200", description = "Продукты найдены"),
                     @ApiResponse(responseCode = "404", description = "Продукты не найдены")
             }
     )
     @GetMapping("/list/search")
-    public String findByNameContaining(
-            @Parameter(description = "Поисковый запрос", required = true) @RequestParam(required = false) String query,
-            Model model
+    public ResponseEntity<List<Product>> findByNameContaining(
+            @Parameter(description = "Поисковый запрос", required = true) @RequestParam String query
     ) {
-        if (query != null && !query.isEmpty()) {
-            List<Product> products = productService.findByNameContaining(query);
-            if (!products.isEmpty()) {
-                model.addAttribute("isProduct", true);
-                model.addAttribute("products", products);
-            } else {
-                model.addAttribute("isProduct", false);
-                model.addAttribute("products", null);
-            }
+        List<Product> products = productService.findByNameContaining(query);
+        if (products.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return "products";
+        return new ResponseEntity<>(products, HttpStatus.OK);
     }
 
     @Operation(
@@ -177,10 +145,22 @@ public class ProductController {
     ) {
         Product product = productService.findById(id);
         if (product != null && product.getImage() != null) {
-            String base64Image = product.getImage();
-            return new ResponseEntity<>(base64Image, HttpStatus.OK);
+            return new ResponseEntity<>(product.getImage(), HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+    }
+
+    // DTO для ответа с продуктом и комментариями
+    @Data
+    private static class ProductResponse {
+        private final Product product;
+        private final List<Comment> comments;
+    }
+
+    // DTO для запроса на создание комментария
+    @Data
+    private static class CommentRequest {
+        private String text;
     }
 }
