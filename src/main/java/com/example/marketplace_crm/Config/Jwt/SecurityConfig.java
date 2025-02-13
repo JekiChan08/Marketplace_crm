@@ -38,7 +38,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests()
                 .requestMatchers("/admin/**").hasAnyRole("ADMIN")
                 .requestMatchers("/delivery_panel/**").hasAnyRole("ADMIN", "DELIVERY")
-                .requestMatchers("/products/**", "/orders/**", "/categories/**", "/users/**").hasAnyRole("ADMIN", "USER")
+                .requestMatchers("/products/**", "/orders/**", "/categories/**", "/users/**", "users/my_orders").hasAnyRole("ADMIN", "USER")
                 .requestMatchers("/auth/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
