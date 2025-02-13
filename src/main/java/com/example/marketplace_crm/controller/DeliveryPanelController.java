@@ -4,20 +4,20 @@ import com.example.marketplace_crm.Model.Order;
 import com.example.marketplace_crm.Model.User;
 import com.example.marketplace_crm.Service.OrderService;
 import com.example.marketplace_crm.Service.UserService;
-import jakarta.servlet.http.HttpSession;
-import lombok.Data;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.Data;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.*;
 
-@Controller
+import java.util.List;
+
+@RestController
 @Data
 @RequestMapping("/delivery_panel")
 @Tag(name = "Delivery Panel Controller", description = "Управление доставкой заказов")
@@ -35,15 +35,12 @@ public class DeliveryPanelController {
             description = "Возвращает список всех активных заказов для доставки"
     )
     @GetMapping("/list_orders")
-    public String listOrders(Model model, HttpSession session) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentPrincipalName = authentication.getName();
-        User user = userService.findByLogin(currentPrincipalName);
-
-        session.setAttribute("delivery", user);
-
-        model.addAttribute("orders", orderService.getAllOrdersIfActive());
-        return "list-orders";
+    public ResponseEntity<List<Order>> listOrders() {
+        List<Order> orders = orderService.getAllOrdersIfActive();
+        if (orders.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<>(orders, HttpStatus.OK);
     }
 
     @Operation(
@@ -52,19 +49,20 @@ public class DeliveryPanelController {
     )
     @ApiResponse(responseCode = "200", description = "Статус заказа обновлен")
     @ApiResponse(responseCode = "404", description = "Заказ не найден")
-    @PostMapping("/on_the_way/{id}")
-    public String onTheWay(
-            @Parameter(description = "ID заказа", required = true) @PathVariable String id,
-            Model model,
-            HttpSession session
+    @PostMapping("/on_the_way/{orderId}")
+    public ResponseEntity<Order> onTheWay(
+            @Parameter(description = "ID заказа", required = true) @PathVariable String orderId
     ) {
-        User delivery = (User) session.getAttribute("delivery");
-        Order order = orderService.findById(id);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentPrincipalName = authentication.getName();
+        User user = userService.findByLogin(currentPrincipalName);
+        Order order = orderService.findById(orderId);
         if (order != null) {
-            order.setDelivery(delivery);
+            order.setDelivery(user);
             order.setStatus("on_the_way");
             orderService.saveOrder(order);
+            return new ResponseEntity<>(order, HttpStatus.OK);
         }
-        return "redirect:/delivery_panel/list_orders";
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 }

@@ -1,5 +1,6 @@
 package com.example.marketplace_crm.Model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,6 +20,7 @@ public class User{
     private String id;
     @Column(name = "login")
     private String login;
+    @JsonBackReference
     @Column(name = "password")
     private String password;
     @ManyToMany(fetch = FetchType.EAGER)
@@ -26,6 +28,8 @@ public class User{
     joinColumns = @JoinColumn(name = "user_id"),
     inverseJoinColumns = @JoinColumn(name = "role_id"))
     private List<Role> roles;
+    @Column(name = "email")
+    private String email;
     public User() {
 
     }

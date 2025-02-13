@@ -12,17 +12,15 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.Data;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.io.IOException;
-import java.util.Base64;
 import java.util.List;
 
 @Tag(name = "Category Controller", description = "Управление категориями")
-@Controller
+@RestController
 @Data
 @RequestMapping("/categories")
 public class CategoryController {
@@ -43,14 +41,14 @@ public class CategoryController {
             }
     )
     @GetMapping("/{id}")
-    public String getById(
-            @Parameter(description = "ID категории", required = true) @PathVariable String id,
-            Model model
+    public ResponseEntity<Category> getById(
+            @Parameter(description = "ID категории", required = true) @PathVariable String id
     ) {
         Category category = categoryService.findById(id);
-        model.addAttribute("category", category);
-        model.addAttribute("all_products", category.getProducts());
-        return "category";
+        if (category == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(category, HttpStatus.OK);
     }
 
 
@@ -63,10 +61,13 @@ public class CategoryController {
             }
     )
     @GetMapping("/list")
-    public String getCategories(Model model) {
+    public ResponseEntity<List<Category>> getCategories() {
         List<Category> categories = categoryService.getAllCategory();
-        model.addAttribute("categories", categories);
-        return "categories";
+        if (categories.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(categories, HttpStatus.OK);
+
     }
 
     @Operation(

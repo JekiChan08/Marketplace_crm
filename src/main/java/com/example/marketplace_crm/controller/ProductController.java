@@ -7,13 +7,14 @@ import com.example.marketplace_crm.Service.CategoryService;
 import com.example.marketplace_crm.Service.CommentService;
 import com.example.marketplace_crm.Service.ProductService;
 import com.example.marketplace_crm.Service.UserService;
+import com.example.marketplace_crm.controller.Requests.CommentRequest;
+import com.example.marketplace_crm.controller.Responses.ProductResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -149,18 +150,5 @@ public class ProductController {
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-    }
-
-    // DTO для ответа с продуктом и комментариями
-    @Data
-    private static class ProductResponse {
-        private final Product product;
-        private final List<Comment> comments;
-    }
-
-    // DTO для запроса на создание комментария
-    @Data
-    private static class CommentRequest {
-        private String text;
     }
 }

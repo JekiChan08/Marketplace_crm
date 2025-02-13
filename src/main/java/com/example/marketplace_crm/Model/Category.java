@@ -1,5 +1,6 @@
 package com.example.marketplace_crm.Model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -18,7 +19,7 @@ public class Category {
     private String name;
     @Column(name = "description")
     private String description;
-
+    @JsonBackReference
     @Column(name = "image")
     private String image;
 

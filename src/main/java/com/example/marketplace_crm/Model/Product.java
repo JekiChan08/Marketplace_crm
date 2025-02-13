@@ -25,7 +25,7 @@ public class Product {
     @JsonBackReference
     @JoinColumn(name = "category_id")
     private Category category;
-
+    @JsonBackReference
     @Column(name = "image", columnDefinition = "LONGTEXT")
     private String image;
 
