@@ -2,9 +2,13 @@ package com.example.marketplace_crm.controller;
 
 import com.example.marketplace_crm.Model.Cart;
 import com.example.marketplace_crm.Model.CartItem;
+import com.example.marketplace_crm.Model.User;
 import com.example.marketplace_crm.Service.Impl.CartService;
 import com.example.marketplace_crm.Service.ProductService;
+import com.example.marketplace_crm.Service.UserService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -17,9 +21,12 @@ public class CartController {
 
     private final ProductService productService;
 
-    public CartController(CartService cartService, ProductService productService) {
+    private final UserService userService;
+
+    public CartController(CartService cartService, ProductService productService, UserService userService) {
         this.cartService = cartService;
         this.productService = productService;
+        this.userService = userService;
     }
 
     @GetMapping("/{userId}/items")
@@ -43,7 +50,7 @@ public class CartController {
     }
 
     @DeleteMapping("/remove")
-    public ResponseEntity<String> removeItem(@RequestParam String userId, @RequestParam String productId) {
+    public ResponseEntity<String> removeItem(@RequestParam("userId") String userId, @RequestParam("productId") String productId) {
         cartService.removeItemFromCart(userId, productId);
         return ResponseEntity.ok("Removed " + productId);
     }
