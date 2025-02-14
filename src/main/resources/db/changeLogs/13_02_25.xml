@@ -16,4 +16,37 @@
                 add column email varchar;
         </sql>
     </changeSet>
+
+    <changeSet id="add-table-carts" author="JekiChan08">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="carts"/>
+            </not>
+        </preConditions>
+        <sql>
+            CREATE TABLE carts (
+                                   user_id VARCHAR PRIMARY KEY,
+                                   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+        </sql>
+    </changeSet>
+
+    <changeSet id="add-table-cartsItem" author="JekiChan08">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="cart_items"/>
+            </not>
+        </preConditions>
+        <sql>
+            CREATE TABLE cart_items (
+                                        id varchar PRIMARY KEY,
+                                        cart_id VARCHAR NOT NULL,
+                                        product_id VARCHAR NOT NULL,
+                                        quantity INT NOT NULL CHECK (quantity > 0),
+                                        price DECIMAL(10,2) NOT NULL CHECK (price >= 0),
+
+                                        CONSTRAINT fk_cart FOREIGN KEY (cart_id) REFERENCES carts(user_id) ON DELETE CASCADE
+            );
+        </sql>
+    </changeSet>
 </databaseChangeLog>
