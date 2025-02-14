@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -38,8 +37,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests()
                 .requestMatchers("/admin/**").hasAnyRole("ADMIN")
                 .requestMatchers("/delivery_panel/**").hasAnyRole("ADMIN", "DELIVERY")
-                .requestMatchers("/products/**", "/orders/**", "/categories/**", "/users/**", "users/my_orders").hasAnyRole("ADMIN", "USER")
-                .requestMatchers("/auth/**").permitAll()
+                .requestMatchers("/products/**", "/orders/**", "/categories/**", "/users/**", "users/my_orders", "/cart/**").hasAnyRole("ADMIN", "USER")
+                .requestMatchers("/auth/**", "/swagger-ui/**", "/v3/api-docs", "/swagger-ui.html").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
