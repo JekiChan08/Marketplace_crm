@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-
 public class UserServiceImpl extends BaseServiceImpl<User, String> {
     private final String USER_ROLE_ID = "1";
     private final String ADMIN_ROLE_ID = "2";

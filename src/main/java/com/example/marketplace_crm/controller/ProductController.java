@@ -23,6 +23,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 @Tag(name = "Product Controller", description = "Управление продуктами")
 @RestController
@@ -130,6 +131,10 @@ public class ProductController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(products, HttpStatus.OK);
+    }
+    @GetMapping("/search/tag")
+    public List<Product> searchByTags(@RequestParam Set<String> tags) {
+        return productService.findByTags(tags);
     }
 
     @Operation(

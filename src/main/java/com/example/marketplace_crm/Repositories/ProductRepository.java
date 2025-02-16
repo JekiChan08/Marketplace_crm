@@ -9,12 +9,14 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Repository
 public interface ProductRepository extends JpaRepository<Product, String> {
     Product findByName(String name);
-    @Query("SELECT p FROM Product p WHERE p.name LIKE %:name% and p.isDeleted = false")
+    @Query("SELECT p FROM Product p WHERE LOWER(p.name) LIKE LOWER(CONCAT('%', :name, '%')) AND p.isDeleted = false")
     List<Product> findByNameContaining(@Param("name") String name);
+
 
     @Query("SELECT p FROM Product p WHERE p.category = :category and p.isDeleted = false")
     List<Product> findByCategory(@Param("category") Category category);
@@ -23,4 +25,7 @@ public interface ProductRepository extends JpaRepository<Product, String> {
     List<Product> findAllActive();
     @Query("SELECT p FROM Product p WHERE p.isDeleted = true ")
     List<Product> findAllDeActive();
+
+    @Query("SELECT p FROM Product p JOIN p.tags t WHERE t.name IN :tags GROUP BY p HAVING COUNT(DISTINCT t) = :tagCount")
+    List<Product> findByTags(@Param("tags") Set<String> tags, @Param("tagCount") long tagCount);
 }

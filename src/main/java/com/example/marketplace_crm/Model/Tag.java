@@ -1,22 +1,22 @@
 package com.example.marketplace_crm.Model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Data;
-
+import java.util.Set;
 
 @Entity
 @Data
 @Table(name = "tags")
 public class Tag {
     @Id
-    @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
-    @ManyToOne
-    @JoinColumn(name = "product_id", nullable = false)
-    private Product product;
+    @Column(name = "name", unique = true, nullable = false)
+    private String name;
 
-    @Column(name = "tag")
-    private String tag;
+    @ManyToMany(mappedBy = "tags")
+    @JsonBackReference
+    private Set<Product> products;
 }

@@ -2,10 +2,9 @@ package com.example.marketplace_crm.controller;
 
 import com.example.marketplace_crm.Model.Category;
 import com.example.marketplace_crm.Model.Product;
-import com.example.marketplace_crm.Service.Impl.CategoryServiceImpl;
-import com.example.marketplace_crm.Service.Impl.OrderServiceImpl;
-import com.example.marketplace_crm.Service.Impl.ProductServiceImpl;
-import com.example.marketplace_crm.Service.Impl.UserServiceImpl;
+import com.example.marketplace_crm.Model.Tag;
+import com.example.marketplace_crm.Repositories.TagRepository;
+import com.example.marketplace_crm.Service.Impl.*;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +14,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.Base64;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -24,6 +25,7 @@ public class AdminController {
     private final OrderServiceImpl orderService;
     private final ProductServiceImpl productService;
     private final CategoryServiceImpl categoryService;
+    private final TagRepository tagRepository;
 
     @Operation(summary = "Получить список всех продуктов")
     @GetMapping("/products")
@@ -56,7 +58,8 @@ public class AdminController {
             @RequestParam("price") double price,
             @RequestParam("description") String description,
             @RequestParam("id_category") String idCategory,
-            @RequestParam(value = "imageFile", required = false) MultipartFile imageFile) throws IOException {
+            @RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
+            @RequestParam(value = "tags", required = false) List<String> tags) throws IOException {
 
         Product product = productService.getById(id);
         if (name != null && !name.isEmpty()) {
@@ -77,6 +80,19 @@ public class AdminController {
             String encodedImage = Base64.getEncoder().encodeToString(imageBytes);
             product.setImage(encodedImage);
         }
+        // Добавление тегов
+        if (tags != null && !tags.isEmpty()) {
+            Set<Tag> tagSet = tags.stream()
+                    .map(tagName -> tagRepository.findByName(tagName).orElseGet(() -> {
+                        Tag newTag = new Tag();
+                        newTag.setName(tagName);
+                        return tagRepository.save(newTag);
+                    }))
+                    .collect(Collectors.toSet());
+
+            product.setTags(tagSet);
+        }
+
 
         productService.save(product);
         return ResponseEntity.ok(product);
@@ -102,7 +118,8 @@ public class AdminController {
             @RequestParam("price") double price,
             @RequestParam("description") String description,
             @RequestParam("id_category") String idCategory,
-            @RequestParam(value = "imageFile", required = false) MultipartFile imageFile) throws IOException {
+            @RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
+            @RequestParam(value = "tags", required = false) List<String> tags) throws IOException {
 
         Product product = new Product();
         product.setName(name);
@@ -116,9 +133,23 @@ public class AdminController {
             product.setImage(encodedImage);
         }
 
+        // Добавление тегов
+        if (tags != null && !tags.isEmpty()) {
+            Set<Tag> tagSet = tags.stream()
+                    .map(tagName -> tagRepository.findByName(tagName).orElseGet(() -> {
+                        Tag newTag = new Tag();
+                        newTag.setName(tagName);
+                        return tagRepository.save(newTag);
+                    }))
+                    .collect(Collectors.toSet());
+
+            product.setTags(tagSet);
+        }
+
         productService.save(product);
         return ResponseEntity.ok(product);
     }
+
 
 
     @Operation(summary = "Удалить продукт")
