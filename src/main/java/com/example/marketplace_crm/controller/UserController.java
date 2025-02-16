@@ -2,8 +2,8 @@ package com.example.marketplace_crm.controller;
 
 import com.example.marketplace_crm.Model.Order;
 import com.example.marketplace_crm.Model.User;
-import com.example.marketplace_crm.Service.OrderService;
-import com.example.marketplace_crm.Service.UserService;
+import com.example.marketplace_crm.Service.Impl.OrderServiceImpl;
+import com.example.marketplace_crm.Service.Impl.UserServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -23,10 +23,10 @@ import java.util.List;
 @Data
 @RequestMapping("/users")
 public class UserController {
-    private final UserService us;
-    private final OrderService os;
+    private final UserServiceImpl us;
+    private final OrderServiceImpl os;
 
-    public UserController(UserService us, OrderService os) {
+    public UserController(UserServiceImpl us, OrderServiceImpl os) {
         this.us = us;
         this.os = os;
     }
@@ -44,7 +44,7 @@ public class UserController {
             @Parameter(description = "ID пользователя", required = true) @PathVariable String id,
             Model model
     ) {
-        User user = us.findById(id);
+        User user = us.getById(id);
         if (user == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -84,9 +84,9 @@ public class UserController {
     )
     @PostMapping("/de_active_order/{orderId}")
     public ResponseEntity<Order> deActiveOrder(Model model, @PathVariable String orderId) {
-        Order order = os.findById(orderId);
+        Order order = os.getById(orderId);
         order.setStatus("de_active");
-        os.saveOrder(order);
+        os.save(order);
         return new ResponseEntity<>(order, HttpStatus.OK);
     }
 }

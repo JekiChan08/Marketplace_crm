@@ -1,8 +1,8 @@
 package com.example.marketplace_crm.controller;
 
 import com.example.marketplace_crm.Model.Category;
-import com.example.marketplace_crm.Service.CategoryService;
-import com.example.marketplace_crm.Service.ProductService;
+import com.example.marketplace_crm.Service.Impl.CategoryServiceImpl;
+import com.example.marketplace_crm.Service.Impl.ProductServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -24,10 +24,10 @@ import java.util.List;
 @Data
 @RequestMapping("/categories")
 public class CategoryController {
-    private final ProductService productService;
-    private final CategoryService categoryService;
+    private final ProductServiceImpl productService;
+    private final CategoryServiceImpl categoryService;
 
-    public CategoryController(ProductService productService, CategoryService categoryService) {
+    public CategoryController(ProductServiceImpl productService, CategoryServiceImpl categoryService) {
         this.productService = productService;
         this.categoryService = categoryService;
     }
@@ -44,7 +44,7 @@ public class CategoryController {
     public ResponseEntity<Category> getById(
             @Parameter(description = "ID категории", required = true) @PathVariable String id
     ) {
-        Category category = categoryService.findById(id);
+        Category category = categoryService.getById(id);
         if (category == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -62,7 +62,7 @@ public class CategoryController {
     )
     @GetMapping("/list")
     public ResponseEntity<List<Category>> getCategories() {
-        List<Category> categories = categoryService.getAllCategory();
+        List<Category> categories = categoryService.findAllActive();
         if (categories.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -82,7 +82,7 @@ public class CategoryController {
     public ResponseEntity<String> getCategoryImage(
             @Parameter(description = "ID категории", required = true) @PathVariable String id
     ) {
-        Category category = categoryService.findById(id);
+        Category category = categoryService.getById(id);
         if (category != null && category.getImage() != null) {
             String base64Image = category.getImage();
             return new ResponseEntity<>(base64Image, HttpStatus.OK);

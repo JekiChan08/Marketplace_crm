@@ -52,7 +52,7 @@ public class AuthController {
             return ResponseEntity.badRequest().body("Пользователь с таким логином уже существует");
         }
 
-        User newUser = userService.saveUser(registrationRequest);
+        User newUser = userService.save(registrationRequest);
         if (newUser == null) {
             return ResponseEntity.badRequest().body("Ошибка регистрации пользователя");
         }
