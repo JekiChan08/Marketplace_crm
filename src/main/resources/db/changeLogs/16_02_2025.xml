@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.6.xsd">
+    <changeSet id="add-table-tags" author="JekiChan08">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="tags"/>
+            </not>
+        </preConditions>
+        <sql>
+            CREATE TABLE tags (
+                                  id varchar PRIMARY KEY,
+                                  name VARCHAR(255) UNIQUE NOT NULL
+            );
+        </sql>
+    </changeSet>
+    <changeSet id="add-table-product_tags" author="JekiChan08">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="product_tags"/>
+            </not>
+        </preConditions>
+        <sql>
+            CREATE TABLE product_tags (
+                                          product_id varchar REFERENCES products(id) ON DELETE CASCADE,
+                                          tag_id varchar REFERENCES tags(id) ON DELETE CASCADE,
+                                          PRIMARY KEY (product_id, tag_id)
+            );
+        </sql>
+    </changeSet>
+</databaseChangeLog>

@@ -2,9 +2,12 @@ package com.example.marketplace_crm.Model;
 
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+
+import java.util.Set;
 
 @Entity
 @Data
@@ -32,6 +35,14 @@ public class Product {
     @Column(name = "is_deleted", nullable = false)
     private boolean isDeleted;
 
+    @ManyToMany
+    @JoinTable(
+            name = "product_tags",
+            joinColumns = @JoinColumn(name = "product_id"),
+            inverseJoinColumns = @JoinColumn(name = "tag_id")
+    )
+    @JsonManagedReference
+    private Set<Tag> tags;
 
     public Product() {
 
