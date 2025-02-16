@@ -3,9 +3,9 @@ package com.example.marketplace_crm.controller;
 import com.example.marketplace_crm.Model.Order;
 import com.example.marketplace_crm.Model.Product;
 import com.example.marketplace_crm.Model.User;
-import com.example.marketplace_crm.Service.OrderService;
-import com.example.marketplace_crm.Service.ProductService;
-import com.example.marketplace_crm.Service.UserService;
+import com.example.marketplace_crm.Service.Impl.OrderServiceImpl;
+import com.example.marketplace_crm.Service.Impl.ProductServiceImpl;
+import com.example.marketplace_crm.Service.Impl.UserServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -25,11 +25,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Data
 @RequestMapping("/orders")
 public class OrderController {
-    private final ProductService productService;
-    private final OrderService orderService;
-    private final UserService userService;
+    private final ProductServiceImpl productService;
+    private final OrderServiceImpl orderService;
+    private final UserServiceImpl userService;
 
-    public OrderController(ProductService productService, OrderService orderService, UserService userService) {
+    public OrderController(ProductServiceImpl productService, OrderServiceImpl orderService, UserServiceImpl userService) {
         this.productService = productService;
         this.orderService = orderService;
         this.userService = userService;
@@ -44,7 +44,7 @@ public class OrderController {
         if (order.getProduct() == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        orderService.saveOrder(order);
+        orderService.save(order);
         return new ResponseEntity<>(order, HttpStatus.CREATED);
 
     }
@@ -57,7 +57,7 @@ public class OrderController {
     public ResponseEntity<Order> orderById(
             @Parameter(description = "ID продукта", required = true) @PathVariable String productId
     ) {
-        Product product = productService.findById(productId);
+        Product product = productService.getById(productId);
         Order order = new Order();
         order.setProduct(product);
 
@@ -66,7 +66,7 @@ public class OrderController {
         User user = userService.findByLogin(currentPrincipalName);
 
         order.setUser(user);
-        orderService.saveOrder(order);
+        orderService.save(order);
         if (order.getProduct() == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }

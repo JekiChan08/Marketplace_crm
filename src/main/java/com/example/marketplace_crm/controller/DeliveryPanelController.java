@@ -2,8 +2,8 @@ package com.example.marketplace_crm.controller;
 
 import com.example.marketplace_crm.Model.Order;
 import com.example.marketplace_crm.Model.User;
-import com.example.marketplace_crm.Service.OrderService;
-import com.example.marketplace_crm.Service.UserService;
+import com.example.marketplace_crm.Service.Impl.OrderServiceImpl;
+import com.example.marketplace_crm.Service.Impl.UserServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -22,10 +22,10 @@ import java.util.List;
 @RequestMapping("/delivery_panel")
 @Tag(name = "Delivery Panel Controller", description = "Управление доставкой заказов")
 public class DeliveryPanelController {
-    private final OrderService orderService;
-    private final UserService userService;
+    private final OrderServiceImpl orderService;
+    private final UserServiceImpl userService;
 
-    public DeliveryPanelController(OrderService orderService, UserService userService) {
+    public DeliveryPanelController(OrderServiceImpl orderService, UserServiceImpl userService) {
         this.orderService = orderService;
         this.userService = userService;
     }
@@ -56,11 +56,11 @@ public class DeliveryPanelController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String currentPrincipalName = authentication.getName();
         User user = userService.findByLogin(currentPrincipalName);
-        Order order = orderService.findById(orderId);
+        Order order = orderService.getById(orderId);
         if (order != null) {
             order.setDelivery(user);
             order.setStatus("on_the_way");
-            orderService.saveOrder(order);
+            orderService.save(order);
             return new ResponseEntity<>(order, HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);

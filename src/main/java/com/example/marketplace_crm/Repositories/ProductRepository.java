@@ -13,10 +13,10 @@ import java.util.Optional;
 @Repository
 public interface ProductRepository extends JpaRepository<Product, String> {
     Product findByName(String name);
-    @Query("SELECT p FROM Product p WHERE p.name LIKE %:name%")
+    @Query("SELECT p FROM Product p WHERE p.name LIKE %:name% and p.isDeleted = false")
     List<Product> findByNameContaining(@Param("name") String name);
 
-    @Query("SELECT p FROM Product p WHERE p.category = :category")
+    @Query("SELECT p FROM Product p WHERE p.category = :category and p.isDeleted = false")
     List<Product> findByCategory(@Param("category") Category category);
 
     @Query("SELECT p FROM Product p WHERE p.isDeleted = false")

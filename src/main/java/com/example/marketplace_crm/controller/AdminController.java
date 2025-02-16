@@ -2,10 +2,10 @@ package com.example.marketplace_crm.controller;
 
 import com.example.marketplace_crm.Model.Category;
 import com.example.marketplace_crm.Model.Product;
-import com.example.marketplace_crm.Service.CategoryService;
-import com.example.marketplace_crm.Service.OrderService;
-import com.example.marketplace_crm.Service.ProductService;
-import com.example.marketplace_crm.Service.UserService;
+import com.example.marketplace_crm.Service.Impl.CategoryServiceImpl;
+import com.example.marketplace_crm.Service.Impl.OrderServiceImpl;
+import com.example.marketplace_crm.Service.Impl.ProductServiceImpl;
+import com.example.marketplace_crm.Service.Impl.UserServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,15 +20,15 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/admin")
 public class AdminController {
-    private final UserService userService;
-    private final OrderService orderService;
-    private final ProductService productService;
-    private final CategoryService categoryService;
+    private final UserServiceImpl userService;
+    private final OrderServiceImpl orderService;
+    private final ProductServiceImpl productService;
+    private final CategoryServiceImpl categoryService;
 
     @Operation(summary = "Получить список всех продуктов")
     @GetMapping("/products")
     public ResponseEntity<List<Product>> getAllProducts() {
-        return ResponseEntity.ok(productService.getAllProduct());
+        return ResponseEntity.ok(productService.getAll());
     }
 
     @Operation(summary = "Редактировать продукт")
@@ -36,7 +36,7 @@ public class AdminController {
     public ResponseEntity<Product> editProduct(@PathVariable String id,
                                                @RequestBody Product product,
                                                @RequestParam(value = "imageFile", required = false) MultipartFile imageFile) throws IOException {
-        Product oldProduct = productService.findById(id);
+        Product oldProduct = productService.getById(id);
         if (imageFile != null && !imageFile.isEmpty()) {
             byte[] imageBytes = imageFile.getBytes();
             String encodedImage = Base64.getEncoder().encodeToString(imageBytes);
@@ -45,7 +45,7 @@ public class AdminController {
             product.setImage(oldProduct.getImage());
         }
         product.setCategory(product.getCategory() != null ? product.getCategory() : oldProduct.getCategory());
-        productService.saveProduct(product);
+        productService.save(product);
         return ResponseEntity.ok(product);
     }
     @Operation(summary = "Редактировать продукт")
@@ -58,7 +58,7 @@ public class AdminController {
             @RequestParam("id_category") String idCategory,
             @RequestParam(value = "imageFile", required = false) MultipartFile imageFile) throws IOException {
 
-        Product product = productService.findById(id);
+        Product product = productService.getById(id);
         if (name != null && !name.isEmpty()) {
             product.setName(name);
         }
@@ -69,7 +69,7 @@ public class AdminController {
             product.setDescription(description);
         }
         if (idCategory != null && !idCategory.isEmpty()) {
-            product.setCategory(categoryService.findById(idCategory));
+            product.setCategory(categoryService.getById(idCategory));
         }
 
         if (imageFile != null && !imageFile.isEmpty()) {
@@ -78,7 +78,7 @@ public class AdminController {
             product.setImage(encodedImage);
         }
 
-        productService.saveProduct(product);
+        productService.save(product);
         return ResponseEntity.ok(product);
     }
 
@@ -91,8 +91,8 @@ public class AdminController {
             String encodedImage = Base64.getEncoder().encodeToString(imageBytes);
             product.setImage(encodedImage);
         }
-        product.setCategory(categoryService.findById(id_category));
-        productService.saveProduct(product);
+        product.setCategory(categoryService.getById(id_category));
+        productService.save(product);
         return ResponseEntity.ok(product);
     }
     @Operation(summary = "Создать новый продукт")
@@ -108,7 +108,7 @@ public class AdminController {
         product.setName(name);
         product.setPrice(price);
         product.setDescription(description);
-        product.setCategory(categoryService.findById(idCategory));
+        product.setCategory(categoryService.getById(idCategory));
 
         if (imageFile != null && !imageFile.isEmpty()) {
             byte[] imageBytes = imageFile.getBytes();
@@ -116,7 +116,7 @@ public class AdminController {
             product.setImage(encodedImage);
         }
 
-        productService.saveProduct(product);
+        productService.save(product);
         return ResponseEntity.ok(product);
     }
 
@@ -124,25 +124,25 @@ public class AdminController {
     @Operation(summary = "Удалить продукт")
     @DeleteMapping("/products/{id}")
     public ResponseEntity<Void> deleteProduct(@PathVariable String id) {
-        Product product = productService.findById(id);
+        Product product = productService.getById(id);
         product.setDeleted(true);
-        productService.saveProduct(product);
+        productService.save(product);
         return ResponseEntity.noContent().build();
     }
 
     @Operation(summary = "Восстановить продукт")
     @PostMapping("/products/restore/{id}")
     public ResponseEntity<Product> restoreProduct(@PathVariable String id) {
-        Product product = productService.findById(id);
+        Product product = productService.getById(id);
         product.setDeleted(false);
-        productService.saveProduct(product);
+        productService.save(product);
         return ResponseEntity.ok(product);
     }
 
     @Operation(summary = "Получить список всех категорий")
     @GetMapping("/categories")
     public ResponseEntity<List<Category>> getAllCategories() {
-        return ResponseEntity.ok(categoryService.getAllCategory());
+        return ResponseEntity.ok(categoryService.getAll());
     }
 
     @Operation(summary = "Создать новую категорию")
@@ -154,7 +154,7 @@ public class AdminController {
             String encodedImage = Base64.getEncoder().encodeToString(imageBytes);
             category.setImage(encodedImage);
         }
-        categoryService.saveCategory(category);
+        categoryService.save(category);
         return ResponseEntity.ok(category);
     }
     @PostMapping(value = "/categories/create", consumes = {"multipart/form-data"})
@@ -175,26 +175,26 @@ public class AdminController {
         if (description != null && !description.isEmpty()) {
             category.setDescription(description);
         }
-        categoryService.saveCategory(category);
+        categoryService.save(category);
         return ResponseEntity.ok(category);
     }
 
     @Operation(summary = "Удалить категорию")
     @DeleteMapping("/categories/{id}")
     public ResponseEntity<Void> deleteCategory(@PathVariable String id) {
-        Category category = categoryService.findById(id);
+        Category category = categoryService.getById(id);
         category.setDeleted(true);
         productService.deActiveProductByCategory(category);
-        categoryService.saveCategory(category);
+        categoryService.save(category);
         return ResponseEntity.noContent().build();
     }
 
     @Operation(summary = "Восстановить категорию")
     @PostMapping("/categories/restore/{id}")
     public ResponseEntity<Category> restoreCategory(@PathVariable String id) {
-        Category category = categoryService.findById(id);
+        Category category = categoryService.getById(id);
         category.setDeleted(false);
-        categoryService.saveCategory(category);
+        categoryService.save(category);
         return ResponseEntity.ok(category);
     }
 }

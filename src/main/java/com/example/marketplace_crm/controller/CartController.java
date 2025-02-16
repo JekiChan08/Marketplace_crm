@@ -2,13 +2,10 @@ package com.example.marketplace_crm.controller;
 
 import com.example.marketplace_crm.Model.Cart;
 import com.example.marketplace_crm.Model.CartItem;
-import com.example.marketplace_crm.Model.User;
 import com.example.marketplace_crm.Service.Impl.CartService;
-import com.example.marketplace_crm.Service.ProductService;
-import com.example.marketplace_crm.Service.UserService;
+import com.example.marketplace_crm.Service.Impl.ProductServiceImpl;
+import com.example.marketplace_crm.Service.Impl.UserServiceImpl;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -19,11 +16,11 @@ public class CartController {
 
     private final CartService cartService;
 
-    private final ProductService productService;
+    private final ProductServiceImpl productService;
 
-    private final UserService userService;
+    private final UserServiceImpl userService;
 
-    public CartController(CartService cartService, ProductService productService, UserService userService) {
+    public CartController(CartService cartService, ProductServiceImpl productService, UserServiceImpl userService) {
         this.cartService = cartService;
         this.productService = productService;
         this.userService = userService;
@@ -44,7 +41,7 @@ public class CartController {
     public ResponseEntity<Cart> addItem(@RequestParam("userId") String userId,
                         @RequestParam("productId") String productId,
                         @RequestParam("quantity") int quantity) {
-        double price = productService.findById(productId).getPrice();
+        double price = productService.getById(productId).getPrice();
         Cart cart = cartService.addItemToCart(userId, productId, quantity, price);
         return ResponseEntity.ok(cart);
     }

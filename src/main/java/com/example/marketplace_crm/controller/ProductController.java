@@ -3,10 +3,10 @@ package com.example.marketplace_crm.controller;
 import com.example.marketplace_crm.Model.Comment;
 import com.example.marketplace_crm.Model.Product;
 import com.example.marketplace_crm.Model.User;
-import com.example.marketplace_crm.Service.CategoryService;
-import com.example.marketplace_crm.Service.CommentService;
-import com.example.marketplace_crm.Service.ProductService;
-import com.example.marketplace_crm.Service.UserService;
+import com.example.marketplace_crm.Service.Impl.CategoryServiceImpl;
+import com.example.marketplace_crm.Service.Impl.CommentsServiceImpl;
+import com.example.marketplace_crm.Service.Impl.ProductServiceImpl;
+import com.example.marketplace_crm.Service.Impl.UserServiceImpl;
 import com.example.marketplace_crm.controller.Requests.CommentRequest;
 import com.example.marketplace_crm.controller.Responses.ProductResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -28,13 +28,13 @@ import java.util.List;
 @RestController
 @RequestMapping("/products")
 public class ProductController {
-    private final ProductService productService;
-    private final CategoryService categoryService;
-    private final CommentService commentsService;
-    private final UserService userService;
+    private final ProductServiceImpl productService;
+    private final CategoryServiceImpl categoryService;
+    private final CommentsServiceImpl commentsService;
+    private final UserServiceImpl userService;
 
     @Autowired
-    public ProductController(ProductService productService, CategoryService categoryService, CommentService commentsService, UserService userService) {
+    public ProductController(ProductServiceImpl productService, CategoryServiceImpl categoryService, CommentsServiceImpl commentsService, UserServiceImpl userService) {
         this.productService = productService;
         this.categoryService = categoryService;
         this.commentsService = commentsService;
@@ -53,7 +53,7 @@ public class ProductController {
     public ResponseEntity<ProductResponse> getById(
             @Parameter(description = "ID продукта", required = true) @PathVariable String id
     ) {
-        Product product = productService.findById(id);
+        Product product = productService.getById(id);
         if (product == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -77,7 +77,7 @@ public class ProductController {
             @Parameter(description = "ID продукта", required = true) @PathVariable String id,
             @RequestBody CommentRequest commentRequest
     ) {
-        Product product = productService.findById(id);
+        Product product = productService.getById(id);
         if (product == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -91,7 +91,7 @@ public class ProductController {
         comment.setProduct(product);
         comment.setUser(user);
 
-        commentsService.saveComment(comment);
+        commentsService.save(comment);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -106,7 +106,7 @@ public class ProductController {
     )
     @GetMapping("/list")
     public ResponseEntity<List<Product>> getAllProducts() {
-        List<Product> products = productService.getAllProduct();
+        List<Product> products = productService.findAllActive();
         if (products.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -144,7 +144,7 @@ public class ProductController {
     public ResponseEntity<String> getProductImage(
             @Parameter(description = "ID продукта", required = true) @PathVariable String id
     ) {
-        Product product = productService.findById(id);
+        Product product = productService.getById(id);
         if (product != null && product.getImage() != null) {
             return new ResponseEntity<>(product.getImage(), HttpStatus.OK);
         } else {
