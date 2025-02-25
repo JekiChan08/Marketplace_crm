@@ -38,7 +38,7 @@ public class SecurityConfig {
                 .requestMatchers("/admin/**").hasAnyRole("ADMIN")
                 .requestMatchers("/delivery_panel/**").hasAnyRole("ADMIN", "DELIVERY")
                 .requestMatchers("/products/**", "/orders/**", "/categories/**", "/users/**", "users/my_orders", "/cart/**").hasAnyRole("ADMIN", "USER")
-                .requestMatchers("/auth/**", "/swagger-ui/**", "/v3/api-docs", "/swagger-ui.html").permitAll()
+                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/auth/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)

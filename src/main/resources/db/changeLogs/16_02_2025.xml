@@ -31,4 +31,18 @@
             );
         </sql>
     </changeSet>
+
+    <changeSet id="add-column-address" author="JekiChan08">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="users" columnName="address"/>
+            </not>
+        </preConditions>
+        <sql>
+            ALTER TABLE users
+                add column address varchar;
+        </sql>
+    </changeSet>
+
+
 </databaseChangeLog>

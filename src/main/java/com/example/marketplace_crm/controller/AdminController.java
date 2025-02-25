@@ -5,7 +5,9 @@ import com.example.marketplace_crm.Model.Product;
 import com.example.marketplace_crm.Model.Tag;
 import com.example.marketplace_crm.Repositories.TagRepository;
 import com.example.marketplace_crm.Service.Impl.*;
-import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.*;
+import io.swagger.v3.oas.annotations.media.*;
+import io.swagger.v3.oas.annotations.responses.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +22,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/admin")
+@io.swagger.v3.oas.annotations.tags.Tag(name = "Admin API", description = "Управление товарами, категориями и заказами")
 public class AdminController {
     private final UserServiceImpl userService;
     private final OrderServiceImpl orderService;
@@ -27,30 +30,22 @@ public class AdminController {
     private final CategoryServiceImpl categoryService;
     private final TagRepository tagRepository;
 
-    @Operation(summary = "Получить список всех продуктов")
+    @Operation(summary = "Получить список всех продуктов", description = "Возвращает все продукты, доступные в системе.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Список продуктов успешно получен",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = Product.class)))
+    })
     @GetMapping("/products")
     public ResponseEntity<List<Product>> getAllProducts() {
         return ResponseEntity.ok(productService.getAll());
     }
 
-    @Operation(summary = "Редактировать продукт")
-    @PostMapping("/products/edit/{id}")
-    public ResponseEntity<Product> editProduct(@PathVariable String id,
-                                               @RequestBody Product product,
-                                               @RequestParam(value = "imageFile", required = false) MultipartFile imageFile) throws IOException {
-        Product oldProduct = productService.getById(id);
-        if (imageFile != null && !imageFile.isEmpty()) {
-            byte[] imageBytes = imageFile.getBytes();
-            String encodedImage = Base64.getEncoder().encodeToString(imageBytes);
-            product.setImage(encodedImage);
-        } else {
-            product.setImage(oldProduct.getImage());
-        }
-        product.setCategory(product.getCategory() != null ? product.getCategory() : oldProduct.getCategory());
-        productService.save(product);
-        return ResponseEntity.ok(product);
-    }
-    @Operation(summary = "Редактировать продукт")
+    @Operation(summary = "Редактировать продукт", description = "Обновляет данные о продукте по его ID")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Продукт успешно обновлён"),
+            @ApiResponse(responseCode = "404", description = "Продукт не найден")
+    })
     @PostMapping(value = "/products/edit/{id}", consumes = {"multipart/form-data"})
     public ResponseEntity<Product> editProduct(
             @PathVariable String id,
@@ -62,25 +57,17 @@ public class AdminController {
             @RequestParam(value = "tags", required = false) List<String> tags) throws IOException {
 
         Product product = productService.getById(id);
-        if (name != null && !name.isEmpty()) {
-            product.setName(name);
-        }
-        if (price != 0) {
-            product.setPrice(price);
-        }
-        if (description != null && !description.isEmpty()) {
-            product.setDescription(description);
-        }
-        if (idCategory != null && !idCategory.isEmpty()) {
-            product.setCategory(categoryService.getById(idCategory));
-        }
+        product.setName(name);
+        product.setPrice(price);
+        product.setDescription(description);
+        product.setCategory(categoryService.getById(idCategory));
 
         if (imageFile != null && !imageFile.isEmpty()) {
             byte[] imageBytes = imageFile.getBytes();
             String encodedImage = Base64.getEncoder().encodeToString(imageBytes);
             product.setImage(encodedImage);
         }
-        // Добавление тегов
+
         if (tags != null && !tags.isEmpty()) {
             Set<Tag> tagSet = tags.stream()
                     .map(tagName -> tagRepository.findByName(tagName).orElseGet(() -> {
@@ -93,25 +80,15 @@ public class AdminController {
             product.setTags(tagSet);
         }
 
-
         productService.save(product);
         return ResponseEntity.ok(product);
     }
 
-    @Operation(summary = "Создать новый продукт")
-    @PostMapping("/products/create")
-    public ResponseEntity<Product> createProduct(@RequestBody Product product, @RequestBody String id_category,
-                                                 @RequestParam(value = "imageFile", required = false) MultipartFile imageFile) throws IOException {
-        if (imageFile != null && !imageFile.isEmpty()) {
-            byte[] imageBytes = imageFile.getBytes();
-            String encodedImage = Base64.getEncoder().encodeToString(imageBytes);
-            product.setImage(encodedImage);
-        }
-        product.setCategory(categoryService.getById(id_category));
-        productService.save(product);
-        return ResponseEntity.ok(product);
-    }
-    @Operation(summary = "Создать новый продукт")
+    @Operation(summary = "Создать новый продукт", description = "Добавляет новый продукт в систему")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Продукт успешно создан"),
+            @ApiResponse(responseCode = "400", description = "Некорректные данные запроса")
+    })
     @PostMapping(value = "/products/create", consumes = {"multipart/form-data"})
     public ResponseEntity<Product> createProduct(
             @RequestParam("name") String name,
@@ -133,7 +110,6 @@ public class AdminController {
             product.setImage(encodedImage);
         }
 
-        // Добавление тегов
         if (tags != null && !tags.isEmpty()) {
             Set<Tag> tagSet = tags.stream()
                     .map(tagName -> tagRepository.findByName(tagName).orElseGet(() -> {
@@ -150,9 +126,11 @@ public class AdminController {
         return ResponseEntity.ok(product);
     }
 
-
-
-    @Operation(summary = "Удалить продукт")
+    @Operation(summary = "Удалить продукт", description = "Помечает продукт как удалённый")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Продукт успешно удалён"),
+            @ApiResponse(responseCode = "404", description = "Продукт не найден")
+    })
     @DeleteMapping("/products/{id}")
     public ResponseEntity<Void> deleteProduct(@PathVariable String id) {
         Product product = productService.getById(id);
@@ -161,7 +139,11 @@ public class AdminController {
         return ResponseEntity.noContent().build();
     }
 
-    @Operation(summary = "Восстановить продукт")
+    @Operation(summary = "Восстановить продукт", description = "Снимает статус удаления с продукта")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Продукт успешно восстановлен"),
+            @ApiResponse(responseCode = "404", description = "Продукт не найден")
+    })
     @PostMapping("/products/restore/{id}")
     public ResponseEntity<Product> restoreProduct(@PathVariable String id) {
         Product product = productService.getById(id);
@@ -170,47 +152,20 @@ public class AdminController {
         return ResponseEntity.ok(product);
     }
 
-    @Operation(summary = "Получить список всех категорий")
+    @Operation(summary = "Получить список всех категорий", description = "Возвращает все категории товаров")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Список категорий успешно получен")
+    })
     @GetMapping("/categories")
     public ResponseEntity<List<Category>> getAllCategories() {
         return ResponseEntity.ok(categoryService.getAll());
     }
 
-    @Operation(summary = "Создать новую категорию")
-    @PostMapping("/categories/create")
-    public ResponseEntity<Category> addCategory(@RequestBody Category category,
-                                                @RequestParam(value = "imageFile", required = false) MultipartFile imageFile) throws IOException {
-        if (imageFile != null && !imageFile.isEmpty()) {
-            byte[] imageBytes = imageFile.getBytes();
-            String encodedImage = Base64.getEncoder().encodeToString(imageBytes);
-            category.setImage(encodedImage);
-        }
-        categoryService.save(category);
-        return ResponseEntity.ok(category);
-    }
-    @PostMapping(value = "/categories/create", consumes = {"multipart/form-data"})
-    public ResponseEntity<Category> addCategory(
-                                                @RequestParam("name") String name,
-                                                @RequestParam("description") String description,
-                                                @RequestParam(value = "imageFile", required = false) MultipartFile imageFile) throws IOException {
-        Category category = new Category();
-
-        if (imageFile != null && !imageFile.isEmpty()) {
-            byte[] imageBytes = imageFile.getBytes();
-            String encodedImage = Base64.getEncoder().encodeToString(imageBytes);
-            category.setImage(encodedImage);
-        }
-        if (name != null && !name.isEmpty()) {
-            category.setName(name);
-        }
-        if (description != null && !description.isEmpty()) {
-            category.setDescription(description);
-        }
-        categoryService.save(category);
-        return ResponseEntity.ok(category);
-    }
-
-    @Operation(summary = "Удалить категорию")
+    @Operation(summary = "Удалить категорию", description = "Помечает категорию как удалённую и отключает все её продукты")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Категория успешно удалена"),
+            @ApiResponse(responseCode = "404", description = "Категория не найдена")
+    })
     @DeleteMapping("/categories/{id}")
     public ResponseEntity<Void> deleteCategory(@PathVariable String id) {
         Category category = categoryService.getById(id);
@@ -220,7 +175,11 @@ public class AdminController {
         return ResponseEntity.noContent().build();
     }
 
-    @Operation(summary = "Восстановить категорию")
+    @Operation(summary = "Восстановить категорию", description = "Снимает статус удаления с категории")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Категория успешно восстановлена"),
+            @ApiResponse(responseCode = "404", description = "Категория не найдена")
+    })
     @PostMapping("/categories/restore/{id}")
     public ResponseEntity<Category> restoreCategory(@PathVariable String id) {
         Category category = categoryService.getById(id);

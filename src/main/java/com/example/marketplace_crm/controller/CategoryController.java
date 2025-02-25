@@ -8,86 +8,81 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Tag(name = "Category Controller", description = "Управление категориями")
+@Tag(name = "Category Controller", description = "API для управления категориями товаров")
 @RestController
-@Data
 @RequestMapping("/categories")
+@RequiredArgsConstructor
 public class CategoryController {
+
     private final ProductServiceImpl productService;
     private final CategoryServiceImpl categoryService;
 
-    public CategoryController(ProductServiceImpl productService, CategoryServiceImpl categoryService) {
-        this.productService = productService;
-        this.categoryService = categoryService;
-    }
-
     @Operation(
             summary = "Получить категорию по ID",
-            description = "Возвращает страницу с информацией о категории и ее продуктами",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Категория найдена"),
-                    @ApiResponse(responseCode = "404", description = "Категория не найдена")
-            }
+            description = "Возвращает информацию о категории и связанных продуктах"
     )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Категория найдена",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = Category.class))),
+            @ApiResponse(responseCode = "404", description = "Категория не найдена")
+    })
     @GetMapping("/{id}")
     public ResponseEntity<Category> getById(
-            @Parameter(description = "ID категории", required = true) @PathVariable String id
+            @Parameter(description = "ID категории", required = true, example = "123")
+            @PathVariable String id
     ) {
         Category category = categoryService.getById(id);
         if (category == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
-        return new ResponseEntity<>(category, HttpStatus.OK);
+        return ResponseEntity.ok(category);
     }
 
-
     @Operation(
-            summary = "Получить все категории",
-            description = "Возвращает страницу со списком всех категорий",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Категории найдены"),
-                    @ApiResponse(responseCode = "404", description = "Категории не найдены")
-            }
+            summary = "Получить список всех категорий",
+            description = "Возвращает список всех активных категорий"
     )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Список категорий",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = Category.class))),
+            @ApiResponse(responseCode = "404", description = "Категории не найдены")
+    })
     @GetMapping("/list")
     public ResponseEntity<List<Category>> getCategories() {
         List<Category> categories = categoryService.findAllActive();
         if (categories.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
-        return new ResponseEntity<>(categories, HttpStatus.OK);
-
+        return ResponseEntity.ok(categories);
     }
 
     @Operation(
             summary = "Получить изображение категории",
-            description = "Возвращает изображение категории в формате Base64",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Изображение найдено", content = @Content(schema = @Schema(type = "string"))),
-                    @ApiResponse(responseCode = "404", description = "Изображение не найдено")
-            }
+            description = "Возвращает изображение категории в формате Base64"
     )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Изображение категории",
+                    content = @Content(mediaType = "text/plain", schema = @Schema(type = "string"))),
+            @ApiResponse(responseCode = "404", description = "Изображение не найдено")
+    })
     @GetMapping("/{id}/image")
     public ResponseEntity<String> getCategoryImage(
-            @Parameter(description = "ID категории", required = true) @PathVariable String id
+            @Parameter(description = "ID категории", required = true, example = "123")
+            @PathVariable String id
     ) {
         Category category = categoryService.getById(id);
         if (category != null && category.getImage() != null) {
-            String base64Image = category.getImage();
-            return new ResponseEntity<>(base64Image, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return ResponseEntity.ok(category.getImage());
         }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 }

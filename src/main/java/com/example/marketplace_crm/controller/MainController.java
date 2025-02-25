@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Data
 @RequestMapping("/")
-@Tag(name = "Main Controller", description = "Основной контроллер для страницы главной страницы")
+@Tag(name = "Main Controller", description = "Основной контроллер для страницы главной страницы(пустой)")
 public class MainController {
     private final ProductServiceImpl productService;
     private final UserServiceImpl userService;
