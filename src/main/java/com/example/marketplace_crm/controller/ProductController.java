@@ -14,8 +14,9 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -25,67 +26,58 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Set;
 
-@Tag(name = "Product Controller", description = "Управление продуктами")
+@Tag(name = "Product Controller", description = "API для управления продуктами")
 @RestController
 @RequestMapping("/products")
+@RequiredArgsConstructor
 public class ProductController {
+
     private final ProductServiceImpl productService;
     private final CategoryServiceImpl categoryService;
     private final CommentsServiceImpl commentsService;
     private final UserServiceImpl userService;
 
-    @Autowired
-    public ProductController(ProductServiceImpl productService, CategoryServiceImpl categoryService, CommentsServiceImpl commentsService, UserServiceImpl userService) {
-        this.productService = productService;
-        this.categoryService = categoryService;
-        this.commentsService = commentsService;
-        this.userService = userService;
-    }
-
-    @Operation(
-            summary = "Получить продукт по ID",
-            description = "Возвращает информацию о продукте и его комментарии",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Продукт найден"),
-                    @ApiResponse(responseCode = "404", description = "Продукт не найден")
-            }
-    )
+    @Operation(summary = "Получить продукт по ID", description = "Возвращает информацию о продукте и его комментарии")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Продукт найден",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProductResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Продукт не найден")
+    })
     @GetMapping("/{id}")
     public ResponseEntity<ProductResponse> getById(
-            @Parameter(description = "ID продукта", required = true) @PathVariable String id
+            @Parameter(description = "ID продукта", required = true, example = "123")
+            @PathVariable String id
     ) {
         Product product = productService.getById(id);
         if (product == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
 
         List<Comment> comments = commentsService.findCommentByProduct(product);
         ProductResponse response = new ProductResponse(product, comments);
 
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return ResponseEntity.ok(response);
     }
 
-    @Operation(
-            summary = "Создать комментарий",
-            description = "Создает новый комментарий для продукта",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Комментарий успешно создан"),
-                    @ApiResponse(responseCode = "400", description = "Неверные данные")
-            }
-    )
+    @Operation(summary = "Создать комментарий", description = "Создает новый комментарий для продукта")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Комментарий успешно создан"),
+            @ApiResponse(responseCode = "400", description = "Неверные данные"),
+            @ApiResponse(responseCode = "404", description = "Продукт не найден")
+    })
     @PostMapping("/{id}/comments")
     public ResponseEntity<Void> createComment(
-            @Parameter(description = "ID продукта", required = true) @PathVariable String id,
+            @Parameter(description = "ID продукта", required = true, example = "123")
+            @PathVariable String id,
             @RequestBody CommentRequest commentRequest
     ) {
         Product product = productService.getById(id);
         if (product == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentPrincipalName = authentication.getName();
-        User user = userService.findByLogin(currentPrincipalName);
+        User user = userService.findByLogin(authentication.getName());
 
         Comment comment = new Comment();
         comment.setText(commentRequest.getText());
@@ -94,66 +86,68 @@ public class ProductController {
 
         commentsService.save(comment);
 
-        return new ResponseEntity<>(HttpStatus.OK);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @Operation(
-            summary = "Получить все продукты",
-            description = "Возвращает список всех продуктов",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Продукты найдены"),
-                    @ApiResponse(responseCode = "404", description = "Продукты не найдены")
-            }
-    )
+    @Operation(summary = "Получить все продукты", description = "Возвращает список всех активных продуктов")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Список продуктов",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = Product.class))),
+            @ApiResponse(responseCode = "404", description = "Продукты не найдены")
+    })
     @GetMapping("/list")
     public ResponseEntity<List<Product>> getAllProducts() {
         List<Product> products = productService.findAllActive();
         if (products.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
-        return new ResponseEntity<>(products, HttpStatus.OK);
+        return ResponseEntity.ok(products);
     }
 
-    @Operation(
-            summary = "Поиск продуктов по названию",
-            description = "Возвращает список продуктов, найденных по названию",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Продукты найдены"),
-                    @ApiResponse(responseCode = "404", description = "Продукты не найдены")
-            }
-    )
+    @Operation(summary = "Поиск продуктов по названию", description = "Возвращает список продуктов, найденных по названию")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Продукты найдены",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = Product.class))),
+            @ApiResponse(responseCode = "404", description = "Продукты не найдены")
+    })
     @GetMapping("/list/search")
     public ResponseEntity<List<Product>> findByNameContaining(
-            @Parameter(description = "Поисковый запрос", required = true) @RequestParam String query
+            @Parameter(description = "Поисковый запрос", required = true, example = "Пицца")
+            @RequestParam String query
     ) {
         List<Product> products = productService.findByNameContaining(query);
         if (products.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
-        return new ResponseEntity<>(products, HttpStatus.OK);
-    }
-    @GetMapping("/search/tag")
-    public List<Product> searchByTags(@RequestParam Set<String> tags) {
-        return productService.findByTags(tags);
+        return ResponseEntity.ok(products);
     }
 
-    @Operation(
-            summary = "Получить изображение продукта",
-            description = "Возвращает изображение продукта в формате Base64",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Изображение найдено", content = @Content(schema = @Schema(type = "string"))),
-                    @ApiResponse(responseCode = "404", description = "Изображение не найдено")
-            }
-    )
+    @Operation(summary = "Поиск продуктов по тегам", description = "Возвращает список продуктов, соответствующих указанным тегам")
+    @ApiResponse(responseCode = "200", description = "Продукты найдены",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = Product.class)))
+    @GetMapping("/search/tag")
+    public ResponseEntity<List<Product>> searchByTags(
+            @Parameter(description = "Список тегов", required = true, example = "[\"веган\", \"без глютена\"]")
+            @RequestParam Set<String> tags
+    ) {
+        return ResponseEntity.ok(productService.findByTags(tags));
+    }
+
+    @Operation(summary = "Получить изображение продукта", description = "Возвращает изображение продукта в формате Base64")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Изображение найдено",
+                    content = @Content(mediaType = "text/plain", schema = @Schema(type = "string"))),
+            @ApiResponse(responseCode = "404", description = "Изображение не найдено")
+    })
     @GetMapping("/{id}/image")
     public ResponseEntity<String> getProductImage(
-            @Parameter(description = "ID продукта", required = true) @PathVariable String id
+            @Parameter(description = "ID продукта", required = true, example = "123")
+            @PathVariable String id
     ) {
         Product product = productService.getById(id);
         if (product != null && product.getImage() != null) {
-            return new ResponseEntity<>(product.getImage(), HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return ResponseEntity.ok(product.getImage());
         }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 }

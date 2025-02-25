@@ -30,6 +30,8 @@ public class User{
     private List<Role> roles;
     @Column(name = "email")
     private String email;
+    @Column(name = "address")
+    private String address;
     public User() {
 
     }

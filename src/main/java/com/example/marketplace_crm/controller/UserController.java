@@ -8,7 +8,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.Data;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -20,9 +19,9 @@ import java.util.List;
 
 @Tag(name = "User Controller", description = "Управление пользователями")
 @RestController
-@Data
 @RequestMapping("/users")
 public class UserController {
+
     private final UserServiceImpl us;
     private final OrderServiceImpl os;
 
@@ -33,16 +32,15 @@ public class UserController {
 
     @Operation(
             summary = "Получить пользователя по ID",
-            description = "Возвращает страницу с информацией о пользователе",
+            description = "Возвращает информацию о пользователе по его ID. Если пользователь не найден, возвращается ошибка 404.",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Пользователь найден"),
+                    @ApiResponse(responseCode = "200", description = "Пользователь найден", content = @io.swagger.v3.oas.annotations.media.Content(mediaType = "application/json", schema = @io.swagger.v3.oas.annotations.media.Schema(implementation = User.class))),
                     @ApiResponse(responseCode = "404", description = "Пользователь не найден")
             }
     )
     @GetMapping("/{id}")
     public ResponseEntity<User> getById(
-            @Parameter(description = "ID пользователя", required = true) @PathVariable String id,
-            Model model
+            @Parameter(description = "ID пользователя", required = true) @PathVariable String id
     ) {
         User user = us.getById(id);
         if (user == null) {
@@ -53,7 +51,11 @@ public class UserController {
 
     @Operation(
             summary = "Получить заказы текущего пользователя",
-            description = "Возвращает список заказов для авторизованного пользователя"
+            description = "Возвращает список заказов для авторизованного пользователя. В случае отсутствия заказов, возвращается ошибка 404.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Список заказов пользователя", content = @io.swagger.v3.oas.annotations.media.Content(mediaType = "application/json", schema = @io.swagger.v3.oas.annotations.media.Schema(implementation = Order.class))),
+                    @ApiResponse(responseCode = "404", description = "Заказы не найдены")
+            }
     )
     @GetMapping("/my_orders")
     public ResponseEntity<List<Order>> myOrders() {
@@ -67,9 +69,18 @@ public class UserController {
         }
         return new ResponseEntity<>(orders, HttpStatus.OK);
     }
+
+    @Operation(
+            summary = "Получить заказы пользователя по его ID",
+            description = "Возвращает список заказов пользователя по его ID. Если заказы не найдены, возвращается ошибка 404.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Список заказов пользователя", content = @io.swagger.v3.oas.annotations.media.Content(mediaType = "application/json", schema = @io.swagger.v3.oas.annotations.media.Schema(implementation = Order.class))),
+                    @ApiResponse(responseCode = "404", description = "Заказы не найдены")
+            }
+    )
     @GetMapping("/my_orders/{userId}")
     public ResponseEntity<List<Order>> myOrders(@PathVariable String userId) {
-        User user = us.findByLogin(userId);
+        User user = us.getById(userId);
 
         List<Order> orders = us.ordersByUser(user);
         if (orders.isEmpty()) {
@@ -80,11 +91,18 @@ public class UserController {
 
     @Operation(
             summary = "Деактивировать заказ",
-            description = "Изменяет статус заказа на 'de_active'"
+            description = "Изменяет статус заказа на 'de_active'. Возвращает деактивированный заказ.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Заказ деактивирован", content = @io.swagger.v3.oas.annotations.media.Content(mediaType = "application/json", schema = @io.swagger.v3.oas.annotations.media.Schema(implementation = Order.class))),
+                    @ApiResponse(responseCode = "404", description = "Заказ не найден")
+            }
     )
     @PostMapping("/de_active_order/{orderId}")
-    public ResponseEntity<Order> deActiveOrder(Model model, @PathVariable String orderId) {
+    public ResponseEntity<Order> deActiveOrder(@PathVariable String orderId) {
         Order order = os.getById(orderId);
+        if (order == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
         order.setStatus("de_active");
         os.save(order);
         return new ResponseEntity<>(order, HttpStatus.OK);
