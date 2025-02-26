@@ -29,12 +29,6 @@ public class AuthController {
     private final JwtProvider jwtProvider;
     private final UserServiceImpl userService;
 
-    @Operation(summary = "Тестовый эндпоинт для входа", description = "Просто возвращает строку 'login'")
-    @GetMapping("r")
-    public String login() {
-        return "login";
-    }
-
     @Operation(summary = "Аутентификация пользователя", description = "Принимает логин и пароль, возвращает access и refresh токены")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Успешная аутентификация",
