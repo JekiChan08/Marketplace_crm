@@ -1,5 +1,6 @@
 package com.example.marketplace_crm.Model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -21,7 +22,7 @@ public class Order {
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
-
+    @JsonIgnore
     @Column(name = "created_at", nullable = false, insertable = false, updatable = false)
     private LocalDateTime createdAt;
 

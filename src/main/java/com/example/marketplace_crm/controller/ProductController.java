@@ -65,28 +65,36 @@ public class ProductController {
             @ApiResponse(responseCode = "400", description = "Неверные данные"),
             @ApiResponse(responseCode = "404", description = "Продукт не найден")
     })
-    @PostMapping("/{id}/comments")
+    @PostMapping("/comments")
     public ResponseEntity<Void> createComment(
             @Parameter(description = "ID продукта", required = true, example = "123")
-            @PathVariable String id,
-            @RequestBody CommentRequest commentRequest
+            @RequestParam("productId") String productId,
+            @RequestParam("text") String text,
+            @RequestParam("userId") String userId
     ) {
-        Product product = productService.getById(id);
+        Product product = productService.getById(productId);
         if (product == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User user = userService.findByLogin(authentication.getName());
+        User user = userService.getById(userId);
 
         Comment comment = new Comment();
-        comment.setText(commentRequest.getText());
+        comment.setText(text);
         comment.setProduct(product);
         comment.setUser(user);
 
         commentsService.save(comment);
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+    @GetMapping("/comments")
+    public ResponseEntity<List<Comment>> getComments(@RequestParam("productId") String productId) {
+        List<Comment> comments = commentsService.findCommentByProduct(productService.getById(productId));
+        if (comments == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        return ResponseEntity.ok(comments);
     }
 
     @Operation(summary = "Получить все продукты", description = "Возвращает список всех активных продуктов")
