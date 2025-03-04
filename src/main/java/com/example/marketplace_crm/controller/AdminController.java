@@ -187,4 +187,51 @@ public class AdminController {
         categoryService.save(category);
         return ResponseEntity.ok(category);
     }
+
+    @Operation(summary = "Создать новую категорию", description = "Добавляет новую категорию в систему")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "категорий успешно создан"),
+            @ApiResponse(responseCode = "400", description = "Некорректные данные запроса")
+    })
+    @PostMapping(value = "/categories/create", consumes = {"multipart/form-data"})
+    public ResponseEntity<Category> createCategory(
+            @RequestParam("name") String name,
+            @RequestParam("description") String description,
+            @RequestParam(value = "imageFile", required = false) MultipartFile imageFile) throws IOException {
+
+        Category category = new Category();
+        category.setName(name);
+        category.setDescription(description);
+
+        if (imageFile != null && !imageFile.isEmpty()) {
+            byte[] imageBytes = imageFile.getBytes();
+            String encodedImage = Base64.getEncoder().encodeToString(imageBytes);
+            category.setImage(encodedImage);
+        }
+
+        categoryService.save(category);
+        return ResponseEntity.ok(category);
+    }
+
+    @PostMapping(value = "/categories/edit/{id}", consumes = {"multipart/form-data"})
+    public ResponseEntity<Category> editCategory(
+            @PathVariable String id,
+            @RequestParam("name") String name,
+            @RequestParam("description") String description,
+            @RequestParam(value = "imageFile", required = false) MultipartFile imageFile) throws IOException {
+
+        Category category = categoryService.getById(id);
+        category.setName(name);
+        category.setDescription(description);
+
+        if (imageFile != null && !imageFile.isEmpty()) {
+            byte[] imageBytes = imageFile.getBytes();
+            String encodedImage = Base64.getEncoder().encodeToString(imageBytes);
+            category.setImage(encodedImage);
+        }
+
+
+        categoryService.save(category);
+        return ResponseEntity.ok(category);
+    }
 }
