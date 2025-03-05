@@ -13,7 +13,7 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends JpaRepository<User, String> {
     Optional<User> findByLogin(String login);
-    @Query("SELECT o FROM Order o WHERE o.user = :user and o.status = 'on_the_way'")
+    @Query("SELECT o FROM Order o WHERE o.user = :user ")
     List<Order> ordersByUser(@Param("user") User user);
 
 }

@@ -57,10 +57,19 @@ public class AdminController {
             @RequestParam(value = "tags", required = false) List<String> tags) throws IOException {
 
         Product product = productService.getById(id);
-        product.setName(name);
-        product.setPrice(price);
-        product.setDescription(description);
-        product.setCategory(categoryService.getById(idCategory));
+        if(name != null) {
+            product.setName(name);
+        }
+        if (price != 0) {
+            product.setPrice(price);
+
+        }
+        if (description != null) {
+            product.setDescription(description);
+        }
+        if (idCategory != null) {
+            product.setCategory(categoryService.getById(idCategory));
+        }
 
         if (imageFile != null && !imageFile.isEmpty()) {
             byte[] imageBytes = imageFile.getBytes();
@@ -221,9 +230,12 @@ public class AdminController {
             @RequestParam(value = "imageFile", required = false) MultipartFile imageFile) throws IOException {
 
         Category category = categoryService.getById(id);
-        category.setName(name);
-        category.setDescription(description);
-
+        if (name != null && !name.isEmpty()) {
+            category.setName(name);
+        }
+        if (description != null && !description.isEmpty()) {
+            category.setDescription(description);
+        }
         if (imageFile != null && !imageFile.isEmpty()) {
             byte[] imageBytes = imageFile.getBytes();
             String encodedImage = Base64.getEncoder().encodeToString(imageBytes);

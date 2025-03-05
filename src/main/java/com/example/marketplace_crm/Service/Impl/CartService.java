@@ -39,7 +39,7 @@ public class CartService {
                 .orElseGet(() -> {
                     Cart newCart = new Cart();
                     newCart.setUserId(userId);
-                    newCart.setItems(new ArrayList<>()); // Инициализация
+                    newCart.setItems(new ArrayList<>());
                     return cartRepository.save(newCart);
                 });
 

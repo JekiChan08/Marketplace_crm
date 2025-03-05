@@ -1,8 +1,7 @@
 package com.example.marketplace_crm.controller;
 
-import com.example.marketplace_crm.Model.Order;
-import com.example.marketplace_crm.Model.Product;
-import com.example.marketplace_crm.Model.User;
+import com.example.marketplace_crm.Model.*;
+import com.example.marketplace_crm.Service.Impl.CartService;
 import com.example.marketplace_crm.Service.Impl.OrderServiceImpl;
 import com.example.marketplace_crm.Service.Impl.ProductServiceImpl;
 import com.example.marketplace_crm.Service.Impl.UserServiceImpl;
@@ -20,6 +19,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.util.List;
+
 @Tag(name = "Order Controller", description = "Управление заказами")
 @Controller
 @Data
@@ -28,11 +29,13 @@ public class OrderController {
     private final ProductServiceImpl productService;
     private final OrderServiceImpl orderService;
     private final UserServiceImpl userService;
+    private final CartService cartService;
 
-    public OrderController(ProductServiceImpl productService, OrderServiceImpl orderService, UserServiceImpl userService) {
+    public OrderController(ProductServiceImpl productService, OrderServiceImpl orderService, UserServiceImpl userService, CartService cartService) {
         this.productService = productService;
         this.orderService = orderService;
         this.userService = userService;
+        this.cartService = cartService;
     }
 
     @Operation(
@@ -71,5 +74,24 @@ public class OrderController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<>(order, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/cart/{cartId}/create")
+    public ResponseEntity<List<Order>> orderCartById(
+            @Parameter(description = "ID Корзины", required = true) @PathVariable String cartId
+    ) {
+        Cart cart = cartService.getCart(cartId);
+
+        cart.getItems().forEach(item -> {
+            for (int i = 0; i < item.getQuantity(); i++) {
+                Order order = new Order();
+                order.setProduct(productService.getById(item.getProductId()));
+                order.setUser(userService.getById(cart.getUserId()));
+                orderService.save(order);
+            }
+        });
+        List<Order> orders = userService.ordersByUser(userService.getById(cart.getUserId()));
+
+        return new ResponseEntity<>(orders, HttpStatus.CREATED);
     }
 }
