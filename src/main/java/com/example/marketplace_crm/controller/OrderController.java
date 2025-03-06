@@ -91,7 +91,7 @@ public class OrderController {
             }
         });
         List<Order> orders = userService.ordersByUser(userService.getById(cart.getUserId()));
-
+        cartService.clearCart(cartId);
         return new ResponseEntity<>(orders, HttpStatus.CREATED);
     }
 }
