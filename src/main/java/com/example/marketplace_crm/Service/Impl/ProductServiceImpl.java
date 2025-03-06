@@ -49,10 +49,6 @@ public class ProductServiceImpl extends BaseServiceImpl<Product, String> {
     };
     public void deActiveProductByCategory(Category category){
         List<Product> products = productRepository.findByCategory(category);
-        for (Product product : products) {
-            Set<Tag> tags = tagRepository.findTagsByProductId(product.getId());
-            product.setTags(tags);
-        }
         for(Product product : products){
             product.setDeleted(true);
             productRepository.save(product);
