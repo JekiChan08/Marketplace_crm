@@ -17,6 +17,5 @@ public class Tag {
     private String name;
 
     @ManyToMany(mappedBy = "tags")
-    @JsonBackReference
     private Set<Product> products;
 }
