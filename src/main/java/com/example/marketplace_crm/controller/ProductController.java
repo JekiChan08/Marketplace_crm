@@ -3,6 +3,7 @@ package com.example.marketplace_crm.controller;
 import com.example.marketplace_crm.Model.Comment;
 import com.example.marketplace_crm.Model.Product;
 import com.example.marketplace_crm.Model.User;
+import com.example.marketplace_crm.Repositories.TagRepository;
 import com.example.marketplace_crm.Service.Impl.CategoryServiceImpl;
 import com.example.marketplace_crm.Service.Impl.CommentsServiceImpl;
 import com.example.marketplace_crm.Service.Impl.ProductServiceImpl;
@@ -36,6 +37,7 @@ public class ProductController {
     private final CategoryServiceImpl categoryService;
     private final CommentsServiceImpl commentsService;
     private final UserServiceImpl userService;
+    private final TagRepository tagRepository;
 
     @Operation(summary = "Получить продукт по ID", description = "Возвращает информацию о продукте и его комментарии")
     @ApiResponses({
@@ -49,6 +51,9 @@ public class ProductController {
             @PathVariable String id
     ) {
         Product product = productService.getById(id);
+            Set<com.example.marketplace_crm. Model.Tag> tags = tagRepository.findTagsByProductId(product.getId());
+            product.setTags(tags);
+
         if (product == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }

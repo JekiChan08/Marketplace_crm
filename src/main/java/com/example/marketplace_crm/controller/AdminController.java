@@ -38,8 +38,10 @@ public class AdminController {
     })
     @GetMapping("/products")
     public ResponseEntity<List<Product>> getAllProducts() {
-        return ResponseEntity.ok(productService.getAll());
+        List<Product> products = productService.findAll();
+        return ResponseEntity.ok(products);
     }
+
 
     @Operation(summary = "Редактировать продукт", description = "Обновляет данные о продукте по его ID")
     @ApiResponses({
@@ -130,9 +132,10 @@ public class AdminController {
 
             product.setTags(tagSet);
         }
-
+        System.out.println(product.getTags());
         productService.save(product);
-        return ResponseEntity.ok(product);
+        Product savedProduct = productService.getById(product.getId());
+        return ResponseEntity.ok(savedProduct);
     }
 
     @Operation(summary = "Удалить продукт", description = "Помечает продукт как удалённый")
@@ -167,7 +170,7 @@ public class AdminController {
     })
     @GetMapping("/categories")
     public ResponseEntity<List<Category>> getAllCategories() {
-        return ResponseEntity.ok(categoryService.getAll());
+        return ResponseEntity.ok(categoryService.findAllWithProducts());
     }
 
     @Operation(summary = "Удалить категорию", description = "Помечает категорию как удалённую и отключает все её продукты")

@@ -1,6 +1,8 @@
 package com.example.marketplace_crm.controller;
 
 import com.example.marketplace_crm.Model.Category;
+import com.example.marketplace_crm.Model.Product;
+import com.example.marketplace_crm.Repositories.TagRepository;
 import com.example.marketplace_crm.Service.Impl.CategoryServiceImpl;
 import com.example.marketplace_crm.Service.Impl.ProductServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
@@ -16,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 @Tag(name = "Category Controller", description = "API для управления категориями товаров")
 @RestController
@@ -25,6 +28,7 @@ public class CategoryController {
 
     private final ProductServiceImpl productService;
     private final CategoryServiceImpl categoryService;
+    private final TagRepository tagRepository;
 
     @Operation(
             summary = "Получить категорию по ID",
@@ -41,6 +45,12 @@ public class CategoryController {
             @PathVariable String id
     ) {
         Category category = categoryService.getById(id);
+        List<Product> products = category.getProducts();
+        for (Product product : products) {
+            Set<com.example.marketplace_crm.Model.Tag> tags = tagRepository.findTagsByProductId(product.getId());
+            product.setTags(tags);
+        }
+
         if (category == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }

@@ -6,6 +6,7 @@ import com.example.marketplace_crm.Model.Tag;
 import com.example.marketplace_crm.Repositories.ProductRepository;
 import com.example.marketplace_crm.Repositories.TagRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -31,13 +32,27 @@ public class ProductServiceImpl extends BaseServiceImpl<Product, String> {
     }
 
     public List<Product> findByNameContaining(String name) {
-        return productRepository.findByNameContaining(name);
+        List<Product> products = productRepository.findByNameContaining(name);
+        for (Product product : products) {
+            Set<Tag> tags = tagRepository.findTagsByProductId(product.getId());
+            product.setTags(tags);
+        }
+        return products;
     }
     public List<Product> findByCategory(Category category){
-        return productRepository.findByCategory(category);
+        List<Product> products = productRepository.findByCategory(category);
+        for (Product product : products) {
+            Set<Tag> tags = tagRepository.findTagsByProductId(product.getId());
+            product.setTags(tags);
+        }
+        return products;
     };
     public void deActiveProductByCategory(Category category){
         List<Product> products = productRepository.findByCategory(category);
+        for (Product product : products) {
+            Set<Tag> tags = tagRepository.findTagsByProductId(product.getId());
+            product.setTags(tags);
+        }
         for(Product product : products){
             product.setDeleted(true);
             productRepository.save(product);
@@ -45,16 +60,30 @@ public class ProductServiceImpl extends BaseServiceImpl<Product, String> {
     }
     public void activeProductByCategory(Category category){
         List<Product> products = productRepository.findByCategory(category);
+        for (Product product : products) {
+            Set<Tag> tags = tagRepository.findTagsByProductId(product.getId());
+            product.setTags(tags);
+        }
         for(Product product : products){
             product.setDeleted(false);
             productRepository.save(product);
         }
     }
     public List<Product> findAllDeActive() {
-        return productRepository.findAllDeActive();
+        List<Product> products = productRepository.findAllDeActive();
+        for (Product product : products) {
+            Set<Tag> tags = tagRepository.findTagsByProductId(product.getId());
+            product.setTags(tags);
+        }
+        return products;
     }
     public List<Product> findAllActive() {
-        return productRepository.findAllActive();
+        List<Product> products = productRepository.findAllActive();
+        for (Product product : products) {
+            Set<Tag> tags = tagRepository.findTagsByProductId(product.getId());
+            product.setTags(tags);
+        }
+        return products;
     }
 
     public Product createProduct(Product product, Set<String> tagNames) {
@@ -70,6 +99,20 @@ public class ProductServiceImpl extends BaseServiceImpl<Product, String> {
         return productRepository.save(product);
     }
     public List<Product> findByTags(Set<String> tagNames) {
-        return productRepository.findByTags(tagNames, tagNames.size());
+        List<Product> products = productRepository.findByTags(tagNames, tagNames.size());
+        for (Product product : products) {
+            Set<Tag> tags = tagRepository.findTagsByProductId(product.getId());
+            product.setTags(tags);
+        }
+        return products;
+    }
+
+    public List<Product> findAll() {
+        List<Product> products = productRepository.findAll();
+        for (Product product : products) {
+            Set<Tag> tags = tagRepository.findTagsByProductId(product.getId());
+            product.setTags(tags);
+        }
+        return products;
     }
 }
